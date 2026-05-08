@@ -281,6 +281,164 @@ body {
   50%     { opacity: 1; }
 }
 
+/* ===== THEME: GOLD BOX ===== */
+.belt-box.gold {
+  background: linear-gradient(135deg, #FFE9A8 0%, #FFC940 50%, #E8A911 100%) !important;
+  border-color: #FFF4C8 !important;
+  box-shadow: 0 0 18px rgba(255,200,40,.7), 0 4px 14px rgba(180,120,0,.4);
+  animation: goldPulse 1.2s ease-in-out infinite;
+}
+.belt-box.gold .box-label { color: rgba(80,45,0,.65); }
+.belt-box.gold::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 12px; pointer-events: none;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: goldShimmer 1.6s linear infinite;
+  mix-blend-mode: overlay;
+}
+@keyframes goldPulse {
+  0%,100% { box-shadow: 0 0 18px rgba(255,200,40,.7), 0 4px 14px rgba(180,120,0,.4); }
+  50%     { box-shadow: 0 0 32px rgba(255,220,80,.95), 0 4px 18px rgba(200,140,0,.55); }
+}
+@keyframes goldShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -100% 0; }
+}
+.gold-spark { font-weight: 900; color: #8a5a00; letter-spacing: .8px; }
+.ub-item.gold { filter: drop-shadow(0 0 12px rgba(255,200,40,.9)) drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
+
+/* ===== THEME: CELL EMOJI + GOLD ===== */
+.cell { position: relative; }
+.cell-emoji {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1; pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.2));
+}
+.cell.gold-cell {
+  background: linear-gradient(135deg, #FFE9A8, #FFC940) !important;
+  border-color: #E8A911 !important;
+  box-shadow: 0 0 14px rgba(255,200,40,.7), inset 0 2px 0 rgba(255,255,255,.55) !important;
+  animation: goldCellGlow 1.4s ease-in-out infinite;
+}
+@keyframes goldCellGlow {
+  0%,100% { filter: brightness(1); }
+  50%     { filter: brightness(1.15); }
+}
+
+/* ===== THEME: ITEM PREVIEW EMOJI ===== */
+.item-shape-preview { position: relative; }
+.ip-emoji {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+}
+.ip-emoji.gold { filter: drop-shadow(0 0 10px rgba(255,200,40,.9)) drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+
+/* ===== SCORE POP GOLD ===== */
+.score-pop.gold { font-size: 28px !important; text-shadow: 0 0 14px rgba(255,200,40,.9); }
+
+/* ===================================================
+   COLLECTION (도감)
+   =================================================== */
+.dex-btn {
+  background: var(--surface); border: none;
+  width: 36px; height: 36px; border-radius: 10px;
+  font-size: 18px; cursor: pointer;
+  box-shadow: var(--shadow-s);
+  transition: transform .15s;
+  position: relative;
+}
+.dex-btn:hover { transform: translateY(-2px) scale(1.06); }
+.dex-btn .dex-count {
+  position: absolute; top: -4px; right: -4px;
+  background: #FF4D88; color: #fff;
+  font-size: 9px; font-weight: 900;
+  padding: 1px 5px; border-radius: 99px;
+  min-width: 14px; line-height: 1.4;
+}
+
+/* NEW 발견 팝업 */
+.dex-new {
+  position: fixed; left: 50%; top: 28%;
+  transform: translate(-50%,-50%) scale(.4);
+  background: linear-gradient(180deg,#FFFDF5,#FFF1C4);
+  border: 3px solid #FFD057;
+  border-radius: 18px;
+  padding: 16px 26px 18px;
+  box-shadow: 0 12px 40px rgba(180,130,0,.35), 0 0 30px rgba(255,200,40,.4);
+  z-index: 10001; pointer-events: none;
+  text-align: center;
+  animation: dexNewIn .4s cubic-bezier(.2,1.6,.4,1) forwards, dexNewOut .35s ease-in 2.1s forwards;
+  min-width: 220px;
+}
+.dex-new .dn-tag {
+  display: inline-block; background: #FF4D88; color: #fff;
+  font-size: 10px; font-weight: 900; letter-spacing: 1px;
+  padding: 2px 9px; border-radius: 99px; margin-bottom: 6px;
+}
+.dex-new .dn-emoji { font-size: 52px; line-height: 1; margin: 4px 0 6px; }
+.dex-new .dn-title { font-size: 13px; font-weight: 800; color: #3a2a00; }
+.dex-new .dn-name  { font-size: 18px; font-weight: 900; color: #8a5a00; margin-top: 2px; }
+@keyframes dexNewIn {
+  0%   { transform: translate(-50%,-50%) scale(.4) rotate(-6deg); opacity: 0; }
+  60%  { transform: translate(-50%,-50%) scale(1.1) rotate(2deg); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+}
+@keyframes dexNewOut {
+  to { transform: translate(-50%,-50%) scale(.85) translateY(-20px); opacity: 0; }
+}
+
+/* 도감 모달 */
+.dex-modal {
+  position: fixed; inset: 0;
+  background: rgba(20,15,10,.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 10002; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.dex-modal.show { display: flex; animation: dexFade .2s ease-out; }
+@keyframes dexFade { from { opacity: 0; } to { opacity: 1; } }
+.dex-card {
+  background: var(--surface); border-radius: 18px;
+  padding: 20px; max-width: 420px; width: 100%;
+  max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.dex-card h2 {
+  margin: 0 0 4px; font-size: 20px; font-weight: 900;
+  color: var(--text-1); text-align: center;
+}
+.dex-card .dex-sub { text-align: center; font-size: 12px; color: var(--text-3); margin-bottom: 14px; font-weight: 700; }
+.dex-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+}
+.dex-tile {
+  aspect-ratio: 1;
+  background: #F5EFE8; border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 32px; position: relative;
+  border: 2px solid transparent;
+}
+.dex-tile.locked { color: #C4B7A8; filter: grayscale(1); opacity: .55; }
+.dex-tile.locked::before { content: '?'; font-size: 32px; font-weight: 900; color: #B5A593; }
+.dex-tile.locked .dt-emoji { display: none; }
+.dex-tile .dt-emoji { line-height: 1; }
+.dex-tile .dt-name {
+  position: absolute; bottom: 3px; left: 0; right: 0;
+  font-size: 9px; font-weight: 800; color: var(--text-2);
+  text-align: center;
+}
+.dex-close {
+  display: block; margin: 16px auto 0;
+  padding: 10px 24px; border: none; border-radius: 10px;
+  background: var(--text-1); color: #fff;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+  cursor: pointer;
+}
+
 /* ===================================================
    GAME AREA (holding + grid)
    =================================================== */
@@ -555,7 +713,9 @@ body {
     <span class="hd-label">점수</span>
     <span class="hd-val" id="score-val">0</span>
   </div>
-  <div class="hd-title">📦 언박싱 마스터</div>
+  <div class="hd-title">📦 언박싱 마스터
+    <button class="dex-btn" id="dex-btn" onclick="openDex()" title="컬렉션 도감" style="margin-left:8px;vertical-align:middle">📖<span class="dex-count" id="dex-count">0</span></button>
+  </div>
   <div class="hd-stat">
     <span class="hd-label">시간</span>
     <span class="hd-val" id="timer-val">0:00</span>
@@ -635,6 +795,16 @@ body {
 <div class="toast"      id="toast"></div>
 <div class="space-warn" id="space-warn">⚠️ 공간이 없어요!</div>
 
+<!-- ========= DEX MODAL ========= -->
+<div class="dex-modal" id="dex-modal" onclick="if(event.target===this)closeDex()">
+  <div class="dex-card">
+    <h2>📖 컬렉션 도감</h2>
+    <div class="dex-sub" id="dex-sub">0 / 0 발견</div>
+    <div class="dex-grid" id="dex-grid"></div>
+    <button class="dex-close" onclick="closeDex()">닫기</button>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    ⚙️  수정 가능한 게임 설정값
@@ -670,31 +840,38 @@ const CONFIG = {
   PTS_PER_CELL:           5,     // 배치 칸당 기본 점수
   LINE_CLEAR_BONUS:     120,     // 줄 클리어 보너스
   COMBO_WINDOW_MS:     4200,     // 콤보 유효 시간 (ms)
+
+  // 희귀도
+  GOLD_BOX_CHANCE:     0.045,    // 골드 상자 출현 확률 (4.5%)
+  GOLD_MULTIPLIER:        5,     // 골드 아이템 점수 배수
 };
 /* ============================================================ */
 
 /* ===  도형 정의  === */
 const SHAPES = {
   easy: [
-    { key:'dot',  cells:[[1]],              label:'소형 박스',  pts: 2 },
-    { key:'h2',   cells:[[1,1]],            label:'가로 2칸',   pts: 3 },
-    { key:'v2',   cells:[[1],[1]],          label:'세로 2칸',   pts: 3 },
+    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2 },
+    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3 },
+    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3 },
   ],
   medium: [
-    { key:'h3',   cells:[[1,1,1]],          label:'가로 3칸',   pts: 5 },
-    { key:'v3',   cells:[[1],[1],[1]],      label:'세로 3칸',   pts: 5 },
-    { key:'sq',   cells:[[1,1],[1,1]],      label:'정사각형',   pts: 7 },
-    { key:'l2',   cells:[[1,0],[1,1]],      label:'ㄱ 소형',    pts: 6 },
-    { key:'r2',   cells:[[0,1],[1,1]],      label:'ㄴ 소형',    pts: 6 },
+    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5 },
+    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5 },
+    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7 },
+    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6 },
+    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6 },
   ],
   hard: [
-    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'L자형',   pts:10 },
-    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'J자형',   pts:10 },
-    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'T자형',   pts:11 },
-    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'S자형',   pts:12 },
-    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'Z자형',   pts:12 },
+    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10 },
+    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10 },
+    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11 },
+    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12 },
+    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12 },
   ],
 };
+
+/* === 골드 상자 (희귀) === */
+const GOLD_COLOR = { bg:'#FFE9A8', dk:'#D9A21A', name:'GOLD', gold:true };
 
 /* === 상자 색상 팔레트 === */
 const COLORS = [
@@ -796,8 +973,9 @@ function renderGrid() {
       el.className = 'cell';
       el.dataset.r = r; el.dataset.c = c;
 
-      if (S.grid[r][c]) {
-        applyFilledStyle(el, S.grid[r][c]);
+      const cell = S.grid[r][c];
+      if (cell) {
+        applyFilledStyle(el, cell.color, { gold: cell.gold, emoji: cell.emoji });
       }
 
       el.addEventListener('mouseenter', () => onHover(r, c));
@@ -812,10 +990,16 @@ function renderGrid() {
   document.getElementById('grid-size-label').textContent = `${S.gridCols}×${S.gridRows}`;
 }
 
-function applyFilledStyle(el, color) {
+function applyFilledStyle(el, color, opts = {}) {
   el.classList.add('filled');
+  if (opts.gold) el.classList.add('gold-cell');
   el.style.background    = color.bg;
   el.style.borderColor   = color.dk;
+  if (opts.emoji) {
+    let em = el.querySelector('.cell-emoji');
+    if (!em) { em = document.createElement('span'); em.className = 'cell-emoji'; el.appendChild(em); }
+    em.textContent = opts.emoji;
+  }
 }
 
 function getCell(r, c) {
@@ -856,7 +1040,7 @@ function renderItemPreview() {
   hintEl.style.display = 'none';
   metaEl.style.display = '';
 
-  const { shape, color } = S.currentItem;
+  const { shape, color, gold } = S.currentItem;
   const rows = shape.cells.length;
   const cols = shape.cells[0].length;
 
@@ -864,16 +1048,25 @@ function renderItemPreview() {
   prevEl.style.gridTemplateRows    = `repeat(${rows}, 22px)`;
   prevEl.innerHTML = '';
 
+  // 큰 이모지를 중앙에 오버레이
+  prevEl.style.position = 'relative';
+  const bg = gold ? GOLD_COLOR.bg : color.bg;
   shape.cells.forEach(row => row.forEach(v => {
     const d = document.createElement('div');
     d.className = `ip-cell ${v ? 'filled' : 'empty'}`;
-    if (v) { d.style.background = color.bg; d.style.borderRadius = '5px'; d.style.boxShadow = `0 2px 6px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5)`; }
+    if (v) { d.style.background = bg; d.style.borderRadius = '5px'; d.style.boxShadow = `0 2px 6px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5)`; }
     prevEl.appendChild(d);
   }));
+  const emojiOverlay = document.createElement('div');
+  emojiOverlay.className = 'ip-emoji' + (gold ? ' gold' : '');
+  emojiOverlay.textContent = shape.emoji || '';
+  prevEl.appendChild(emojiOverlay);
 
   const cellCount = shape.cells.flat().reduce((a,v)=>a+v,0);
-  nameEl.textContent = shape.label;
-  ptsEl.textContent  = `+${shape.pts * cellCount * CONFIG.PTS_PER_CELL} 점`;
+  let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
+  if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
+  nameEl.textContent = (gold ? '✨ GOLD · ' : '') + shape.label;
+  ptsEl.textContent  = `+${pts} 점` + (gold ? '  (×5)' : '');
 }
 
 /* ===================================================
@@ -930,7 +1123,7 @@ function onLeave() {
 function onCellClick(r, c) {
   if (!S.currentItem || S.gameOver) return;
 
-  const { shape, color } = S.currentItem;
+  const { shape, color, gold } = S.currentItem;
 
   if (!canPlace(shape, r, c)) {
     playSound('error');
@@ -941,11 +1134,13 @@ function onCellClick(r, c) {
 
   // ── place cells ──
   const placedCells = [];
+  let _firstStored = false;
   for (let dr = 0; dr < shape.cells.length; dr++)
     for (let dc = 0; dc < shape.cells[dr].length; dc++)
       if (shape.cells[dr][dc]) {
         const gr = r + dr, gc = c + dc;
-        S.grid[gr][gc] = color;
+        const isFirst = !_firstStored; _firstStored = true;
+        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null };
         placedCells.push({ gr, gc });
       }
 
@@ -953,6 +1148,7 @@ function onCellClick(r, c) {
   const now = performance.now();
   const cellCount = placedCells.length;
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
+  if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
 
   if (now - S.lastPlaceTs < CONFIG.COMBO_WINDOW_MS) {
     S.combo++;
@@ -969,19 +1165,23 @@ function onCellClick(r, c) {
 
   // ── animate cells ──
   clearGhost();
+  // 모양 좌상단 셀에만 이모지 표시
+  let emojiPlaced = false;
   placedCells.forEach(({ gr, gc }, i) => {
     const el = getCell(gr, gc);
     if (!el) return;
-    applyFilledStyle(el, color);
+    const showEmoji = !emojiPlaced;
+    if (showEmoji) emojiPlaced = true;
+    applyFilledStyle(el, color, { gold, emoji: showEmoji ? shape.emoji : null });
     setTimeout(() => {
       el.classList.add('snap');
       setTimeout(() => el.classList.remove('snap'), 320);
-      spawnPlaceParticles(el, color);
+      spawnPlaceParticles(el, gold ? GOLD_COLOR : color);
     }, i * 18);
   });
 
   // ── score popup ──
-  spawnScorePop(pts, r, c);
+  spawnScorePop(pts, r, c, gold);
 
   S.currentItem = null;
   renderItemPreview();
@@ -1048,20 +1248,22 @@ function spawnBox() {
   const beltEl = document.getElementById('belt');
   const beltW  = beltEl.parentElement.offsetWidth || 560;
 
-  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const shape = pickShape();
-  const id    = S.boxCounter++;
+  const isGold = Math.random() < CONFIG.GOLD_BOX_CHANCE;
+  const color  = isGold ? GOLD_COLOR : COLORS[Math.floor(Math.random() * COLORS.length)];
+  const shape  = pickShape();
+  const id     = S.boxCounter++;
 
   const el = document.createElement('div');
-  el.className = 'belt-box';
+  el.className = 'belt-box' + (isGold ? ' gold' : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
-  el.innerHTML = `<div class="box-emoji">📦</div><div class="box-label">${color.name}</div>`;
+  const labelHtml = isGold ? '<span class="gold-spark">✨ GOLD ✨</span>' : color.name;
+  el.innerHTML = `<div class="box-emoji">${isGold ? '🎁' : '📦'}</div><div class="box-label">${labelHtml}</div>`;
   el.addEventListener('click', () => openBox(id));
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold });
 }
 
 function openBox(id) {
@@ -1082,8 +1284,9 @@ function openBox(id) {
   lid.className = 'ub-lid';
   const item = document.createElement('div');
   item.className = 'ub-item';
-  item.textContent = '🎁';
+  item.textContent = box.shape.emoji || '🎁';
   item.style.color = box.color.dk;
+  if (box.gold) item.classList.add('gold');
   box.el.appendChild(lid);
   box.el.appendChild(item);
 
@@ -1091,8 +1294,11 @@ function openBox(id) {
 
   setTimeout(() => {
     box.el.remove();
-    S.currentItem = { shape: box.shape, color: box.color };
+    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold };
     renderItemPreview();
+
+    // 도감 등록 (첫 발견 시 NEW 팝업)
+    registerDiscovery(box.shape, box.gold);
 
     // Check if item fits anywhere
     if (!fitsAnywhere(S.currentItem.shape)) {
@@ -1242,6 +1448,73 @@ function spawnComboBanner(combo) {
 }
 
 /* ===================================================
+   📖  COLLECTION (DEX)
+   =================================================== */
+const DEX_KEY = 'unboxing_dex_v1';
+let DEX = loadDex();
+
+function loadDex() {
+  try { return new Set(JSON.parse(localStorage.getItem(DEX_KEY) || '[]')); }
+  catch (_) { return new Set(); }
+}
+function saveDex() {
+  try { localStorage.setItem(DEX_KEY, JSON.stringify([...DEX])); } catch(_){}
+}
+function allShapes() {
+  return [...SHAPES.easy, ...SHAPES.medium, ...SHAPES.hard];
+}
+function updateDexCount() {
+  const el = document.getElementById('dex-count');
+  if (el) el.textContent = DEX.size;
+}
+function registerDiscovery(shape, isGold) {
+  const key = (isGold ? 'gold:' : '') + shape.key;
+  const baseKey = shape.key;
+  const isNewBase = !DEX.has(baseKey);
+  const isNewGold = isGold && !DEX.has('gold:' + baseKey);
+  if (isNewBase) DEX.add(baseKey);
+  if (isGold) DEX.add('gold:' + baseKey);
+  if (isNewBase || isNewGold) {
+    saveDex();
+    updateDexCount();
+    spawnDexNew(shape, isGold && !isNewBase);  // gold-only second find shows GOLD tag
+  }
+}
+function spawnDexNew(shape, goldOnly) {
+  const el = document.createElement('div');
+  el.className = 'dex-new';
+  const tag = goldOnly ? '✨ GOLD 발견!' : 'NEW! 컬렉션 등록';
+  el.innerHTML = `
+    <div class="dn-tag">${tag}</div>
+    <div class="dn-emoji">${shape.emoji || '🎁'}</div>
+    <div class="dn-title">${goldOnly ? '골드 버전!' : '새 아이템'}</div>
+    <div class="dn-name">${shape.label}</div>
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2700);
+}
+function openDex() {
+  const grid = document.getElementById('dex-grid');
+  const items = allShapes();
+  grid.innerHTML = '';
+  items.forEach(s => {
+    const found = DEX.has(s.key);
+    const gold  = DEX.has('gold:' + s.key);
+    const t = document.createElement('div');
+    t.className = 'dex-tile' + (found ? '' : ' locked') + (gold ? ' gold-cell' : '');
+    t.innerHTML = `<span class="dt-emoji">${s.emoji || '🎁'}</span>` +
+                  (found ? `<span class="dt-name">${s.label}${gold ? ' ✨' : ''}</span>` : '');
+    grid.appendChild(t);
+  });
+  document.getElementById('dex-sub').textContent =
+    `${items.filter(s => DEX.has(s.key)).length} / ${items.length} 발견`;
+  document.getElementById('dex-modal').classList.add('show');
+}
+function closeDex() {
+  document.getElementById('dex-modal').classList.remove('show');
+}
+
+/* ===================================================
    🏆  SCORE & TIMER
    =================================================== */
 function updateScoreUI() {
@@ -1333,7 +1606,7 @@ function showSpaceWarn() {
   _swTm = setTimeout(() => el.classList.remove('show'), 1600);
 }
 
-function spawnScorePop(pts, r, c) {
+function spawnScorePop(pts, r, c, gold = false) {
   const gridEl = document.getElementById('grid');
   const rect   = gridEl.getBoundingClientRect();
   const cols   = S.gridCols;
@@ -1343,11 +1616,11 @@ function spawnScorePop(pts, r, c) {
   const y = rect.top  + r * rh;
 
   const el = document.createElement('div');
-  el.className = 'score-pop';
-  el.textContent = `+${pts}`;
+  el.className = 'score-pop' + (gold ? ' gold' : '');
+  el.textContent = (gold ? '✨ +' : '+') + pts + (gold ? ' ×5' : '');
   el.style.left  = x + 'px';
   el.style.top   = y + 'px';
-  el.style.color = '#3CC44A';
+  el.style.color = gold ? '#D9A21A' : '#3CC44A';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 950);
 }
@@ -1405,6 +1678,7 @@ window.addEventListener('load', () => {
   updateTimer();
   updateOverflowBadge();
   recalcPressure();
+  updateDexCount();
 
   // First box after short delay for drama
   setTimeout(spawnBox, 700);
