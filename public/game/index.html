@@ -923,6 +923,12 @@ function makeState() {
     gameOver:      false,
     running:       false,
     lastFrame:     0,
+
+    // 체험판 (맛보기 확장)
+    trialActive:   false,
+    trialAddedRows:0,
+    trialEndTs:    0,
+    trialUsed:     false,   // 게임당 1회만 등장하도록 제한
   };
 }
 
