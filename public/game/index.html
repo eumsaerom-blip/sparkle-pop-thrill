@@ -818,23 +818,26 @@ const CONFIG = {
 
   // 벨트
   BELT_SPEED_INITIAL:    38,     // 초기 벨트 속도 (px/초)
-  BELT_SPEED_MAX:       145,     // 최대 벨트 속도 (px/초)
-  BELT_SPEED_INCREMENT:   7,     // 속도 증가량 (매 SPEED_UP_EVERY 초)
-  BOX_SPAWN_INTERVAL:  2700,     // 상자 생성 간격 (ms)
+  BELT_SPEED_MAX:       190,     // 최대 벨트 속도 (px/초)
+  BELT_SPEED_INCREMENT:  11,     // 속도 증가량 (매 SPEED_UP_EVERY 초)
+  BOX_SPAWN_INTERVAL:  2700,     // 상자 생성 기본 간격 (ms) – 시간 따라 줄어듦
+  BOX_SPAWN_MIN:       1100,     // 상자 생성 최소 간격 (ms)
+  BOX_SPAWN_RAMP:        10,     // 1초마다 줄어드는 ms (가속 곡선)
   BOX_WIDTH:             80,     // 상자 너비 (px) – 이 값과 CSS를 맞춰주세요
   MAX_BELT_BOXES:         6,     // 벨트 최대 상자 수
 
   // 난이도 단계 (초)
-  MEDIUM_AT:             30,     // 중간 도형 등장
-  HARD_AT:               65,     // 어려운 도형 등장
-  SPEED_UP_EVERY:        15,     // 속도 증가 주기 (초)
+  MEDIUM_AT:             25,     // 중간 도형 등장
+  HARD_AT:               55,     // 어려운 도형 등장
+  SPEED_UP_EVERY:        11,     // 속도 증가 주기 (초)
 
   // 압박감
   PRESSURE_WARN:         62,     // 경고 압박 수치 (%)
   PRESSURE_CRIT:         84,     // 위험 압박 수치 (%)
-  PRESSURE_FILL_WEIGHT:  55,     // 그리드 채움이 압박에 미치는 최대 기여값
-  OVERFLOW_PRESSURE:     10,     // 상자 누락 1개당 압박 증가
+  PRESSURE_FILL_WEIGHT:  60,     // 그리드 채움이 압박에 미치는 최대 기여값
+  OVERFLOW_PRESSURE:     12,     // 상자 누락 1개당 압박 증가
   NO_SPACE_PRESSURE:     14,     // 배치 불가 아이템당 압박 증가
+  SALE_AT:               90,     // 압박감 ≥ 이 값에서 할인 말풍선 등장
 
   // 점수
   PTS_PER_CELL:           5,     // 배치 칸당 기본 점수
@@ -844,6 +847,10 @@ const CONFIG = {
   // 희귀도
   GOLD_BOX_CHANCE:     0.045,    // 골드 상자 출현 확률 (4.5%)
   GOLD_MULTIPLIER:        5,     // 골드 아이템 점수 배수
+
+  // 체험판
+  TRIAL_BOX_CHANCE:    0.035,    // 체험판(맛보기) 상자 출현 확률
+  TRIAL_DURATION_MS: 10000,      // 체험판 진열장 2배 지속시간 (ms)
 };
 /* ============================================================ */
 
