@@ -870,7 +870,7 @@ function renderItemPreview() {
   hintEl.style.display = 'none';
   metaEl.style.display = '';
 
-  const { shape, color } = S.currentItem;
+  const { shape, color, gold } = S.currentItem;
   const rows = shape.cells.length;
   const cols = shape.cells[0].length;
 
@@ -878,16 +878,25 @@ function renderItemPreview() {
   prevEl.style.gridTemplateRows    = `repeat(${rows}, 22px)`;
   prevEl.innerHTML = '';
 
+  // 큰 이모지를 중앙에 오버레이
+  prevEl.style.position = 'relative';
+  const bg = gold ? GOLD_COLOR.bg : color.bg;
   shape.cells.forEach(row => row.forEach(v => {
     const d = document.createElement('div');
     d.className = `ip-cell ${v ? 'filled' : 'empty'}`;
-    if (v) { d.style.background = color.bg; d.style.borderRadius = '5px'; d.style.boxShadow = `0 2px 6px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5)`; }
+    if (v) { d.style.background = bg; d.style.borderRadius = '5px'; d.style.boxShadow = `0 2px 6px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5)`; }
     prevEl.appendChild(d);
   }));
+  const emojiOverlay = document.createElement('div');
+  emojiOverlay.className = 'ip-emoji' + (gold ? ' gold' : '');
+  emojiOverlay.textContent = shape.emoji || '';
+  prevEl.appendChild(emojiOverlay);
 
   const cellCount = shape.cells.flat().reduce((a,v)=>a+v,0);
-  nameEl.textContent = shape.label;
-  ptsEl.textContent  = `+${shape.pts * cellCount * CONFIG.PTS_PER_CELL} 점`;
+  let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
+  if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
+  nameEl.textContent = (gold ? '✨ GOLD · ' : '') + shape.label;
+  ptsEl.textContent  = `+${pts} 점` + (gold ? '  (×5)' : '');
 }
 
 /* ===================================================
