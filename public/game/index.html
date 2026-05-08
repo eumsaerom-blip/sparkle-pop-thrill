@@ -1171,6 +1171,74 @@ function recalcPressure() {
 
   if (S.pressure >= 100) triggerGameOver();
   updatePanelGlow();
+  updateVignette();
+}
+
+/* ===================================================
+   ✨  JUICE FX  (particles + combo banner + vignette)
+   =================================================== */
+function fxLayer() {
+  let l = document.getElementById('fx-layer');
+  if (!l) { l = document.createElement('div'); l.id = 'fx-layer'; document.body.appendChild(l); }
+  return l;
+}
+
+function spawnPlaceParticles(cellEl, color) {
+  const layer = fxLayer();
+  const rect = cellEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const count = 9 + Math.floor(Math.random() * 4);
+  const palette = [color.dk, color.bg, '#FFFFFF', '#FFD93D'];
+
+  for (let i = 0; i < count; i++) {
+    const isStar = Math.random() < 0.35;
+    const p = document.createElement('div');
+    p.className = 'fx-particle ' + (isStar ? 'star' : 'dot');
+    if (isStar) {
+      p.textContent = '★';
+    } else {
+      const c = palette[Math.floor(Math.random() * palette.length)];
+      p.style.background = c;
+      p.style.boxShadow = `0 0 8px ${c}`;
+    }
+    const angle = (Math.PI * 2) * (i / count) + Math.random() * 0.6;
+    const dist = 40 + Math.random() * 55;
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    p.style.setProperty('--rot', (Math.random() * 540 - 270) + 'deg');
+    layer.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+}
+
+let _vigEl = null;
+function updateVignette() {
+  if (!_vigEl) {
+    _vigEl = document.createElement('div');
+    _vigEl.id = 'vignette';
+    document.body.appendChild(_vigEl);
+  }
+  const on = S.pressure >= CONFIG.PRESSURE_CRIT && !S.gameOver;
+  _vigEl.classList.toggle('active', on);
+}
+
+let _comboBannerEl = null;
+function spawnComboBanner(combo) {
+  let label, cls;
+  if (combo >= 7)      { label = 'AMAZING!'; cls = 'amazing'; }
+  else if (combo >= 5) { label = 'PERFECT!'; cls = 'perfect'; }
+  else                 { label = 'GREAT!';   cls = 'great';   }
+
+  if (_comboBannerEl) _comboBannerEl.remove();
+  const el = document.createElement('div');
+  el.className = 'combo-banner ' + cls;
+  el.textContent = label;
+  document.body.appendChild(el);
+  _comboBannerEl = el;
+  setTimeout(() => { if (el === _comboBannerEl) _comboBannerEl = null; el.remove(); }, 950);
 }
 
 /* ===================================================
