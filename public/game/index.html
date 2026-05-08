@@ -1802,8 +1802,12 @@ function loop(ts) {
   S.lastFrame    = ts;
   S.timeElapsed += dt;
 
-  // Spawn boxes
-  if (ts - S.lastSpawn > CONFIG.BOX_SPAWN_INTERVAL && S.boxes.length < CONFIG.MAX_BELT_BOXES) {
+  // Spawn boxes — interval은 시간이 지날수록 짧아짐 (가속 곡선)
+  const dynInterval = Math.max(
+    CONFIG.BOX_SPAWN_MIN,
+    CONFIG.BOX_SPAWN_INTERVAL - S.timeElapsed * CONFIG.BOX_SPAWN_RAMP
+  );
+  if (ts - S.lastSpawn > dynInterval && S.boxes.length < CONFIG.MAX_BELT_BOXES) {
     spawnBox();
     S.lastSpawn = ts;
   }
@@ -1819,6 +1823,7 @@ function loop(ts) {
 
   updateBelt(dt);
   recalcPressure();
+  updateTrialTick(ts);
   updateTimer();
 
   requestAnimationFrame(loop);
