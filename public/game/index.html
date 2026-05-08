@@ -1055,20 +1055,22 @@ function spawnBox() {
   const beltEl = document.getElementById('belt');
   const beltW  = beltEl.parentElement.offsetWidth || 560;
 
-  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const shape = pickShape();
-  const id    = S.boxCounter++;
+  const isGold = Math.random() < CONFIG.GOLD_BOX_CHANCE;
+  const color  = isGold ? GOLD_COLOR : COLORS[Math.floor(Math.random() * COLORS.length)];
+  const shape  = pickShape();
+  const id     = S.boxCounter++;
 
   const el = document.createElement('div');
-  el.className = 'belt-box';
+  el.className = 'belt-box' + (isGold ? ' gold' : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
-  el.innerHTML = `<div class="box-emoji">📦</div><div class="box-label">${color.name}</div>`;
+  const labelHtml = isGold ? '<span class="gold-spark">✨ GOLD ✨</span>' : color.name;
+  el.innerHTML = `<div class="box-emoji">${isGold ? '🎁' : '📦'}</div><div class="box-label">${labelHtml}</div>`;
   el.addEventListener('click', () => openBox(id));
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold });
 }
 
 function openBox(id) {
