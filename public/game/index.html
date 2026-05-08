@@ -676,25 +676,28 @@ const CONFIG = {
 /* ===  도형 정의  === */
 const SHAPES = {
   easy: [
-    { key:'dot',  cells:[[1]],              label:'소형 박스',  pts: 2 },
-    { key:'h2',   cells:[[1,1]],            label:'가로 2칸',   pts: 3 },
-    { key:'v2',   cells:[[1],[1]],          label:'세로 2칸',   pts: 3 },
+    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2 },
+    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3 },
+    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3 },
   ],
   medium: [
-    { key:'h3',   cells:[[1,1,1]],          label:'가로 3칸',   pts: 5 },
-    { key:'v3',   cells:[[1],[1],[1]],      label:'세로 3칸',   pts: 5 },
-    { key:'sq',   cells:[[1,1],[1,1]],      label:'정사각형',   pts: 7 },
-    { key:'l2',   cells:[[1,0],[1,1]],      label:'ㄱ 소형',    pts: 6 },
-    { key:'r2',   cells:[[0,1],[1,1]],      label:'ㄴ 소형',    pts: 6 },
+    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5 },
+    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5 },
+    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7 },
+    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6 },
+    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6 },
   ],
   hard: [
-    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'L자형',   pts:10 },
-    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'J자형',   pts:10 },
-    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'T자형',   pts:11 },
-    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'S자형',   pts:12 },
-    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'Z자형',   pts:12 },
+    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10 },
+    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10 },
+    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11 },
+    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12 },
+    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12 },
   ],
 };
+
+/* === 골드 상자 (희귀) === */
+const GOLD_COLOR = { bg:'#FFE9A8', dk:'#D9A21A', name:'GOLD', gold:true };
 
 /* === 상자 색상 팔레트 === */
 const COLORS = [
