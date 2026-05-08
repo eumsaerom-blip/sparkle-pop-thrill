@@ -1075,22 +1075,34 @@ function openBox(id) {
   }
 
   const box = S.boxes.splice(idx, 1)[0];
-  box.el.classList.add('opening');
-  setTimeout(() => box.el.remove(), 420);
+
+  // ── unboxing animation: lid pops open + item shoots up ──
+  box.el.classList.add('unboxing');
+  const lid = document.createElement('div');
+  lid.className = 'ub-lid';
+  const item = document.createElement('div');
+  item.className = 'ub-item';
+  item.textContent = '🎁';
+  item.style.color = box.color.dk;
+  box.el.appendChild(lid);
+  box.el.appendChild(item);
 
   playSound('click');
 
-  S.currentItem = { shape: box.shape, color: box.color };
-  renderItemPreview();
+  setTimeout(() => {
+    box.el.remove();
+    S.currentItem = { shape: box.shape, color: box.color };
+    renderItemPreview();
 
-  // Check if item fits anywhere
-  if (!fitsAnywhere(S.currentItem.shape)) {
-    setTimeout(() => {
-      showSpaceWarn();
-      S.pressure = Math.min(100, S.pressure + CONFIG.NO_SPACE_PRESSURE);
-      recalcPressure();
-    }, 150);
-  }
+    // Check if item fits anywhere
+    if (!fitsAnywhere(S.currentItem.shape)) {
+      setTimeout(() => {
+        showSpaceWarn();
+        S.pressure = Math.min(100, S.pressure + CONFIG.NO_SPACE_PRESSURE);
+        recalcPressure();
+      }, 150);
+    }
+  }, 380);
 }
 
 function updateBelt(dt) {
