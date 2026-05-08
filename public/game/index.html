@@ -943,7 +943,7 @@ function onLeave() {
 function onCellClick(r, c) {
   if (!S.currentItem || S.gameOver) return;
 
-  const { shape, color } = S.currentItem;
+  const { shape, color, gold } = S.currentItem;
 
   if (!canPlace(shape, r, c)) {
     playSound('error');
@@ -966,6 +966,7 @@ function onCellClick(r, c) {
   const now = performance.now();
   const cellCount = placedCells.length;
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
+  if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
 
   if (now - S.lastPlaceTs < CONFIG.COMBO_WINDOW_MS) {
     S.combo++;
@@ -982,19 +983,23 @@ function onCellClick(r, c) {
 
   // ── animate cells ──
   clearGhost();
+  // 모양 좌상단 셀에만 이모지 표시
+  let emojiPlaced = false;
   placedCells.forEach(({ gr, gc }, i) => {
     const el = getCell(gr, gc);
     if (!el) return;
-    applyFilledStyle(el, color);
+    const showEmoji = !emojiPlaced;
+    if (showEmoji) emojiPlaced = true;
+    applyFilledStyle(el, color, { gold, emoji: showEmoji ? shape.emoji : null });
     setTimeout(() => {
       el.classList.add('snap');
       setTimeout(() => el.classList.remove('snap'), 320);
-      spawnPlaceParticles(el, color);
+      spawnPlaceParticles(el, gold ? GOLD_COLOR : color);
     }, i * 18);
   });
 
   // ── score popup ──
-  spawnScorePop(pts, r, c);
+  spawnScorePop(pts, r, c, gold);
 
   S.currentItem = null;
   renderItemPreview();
