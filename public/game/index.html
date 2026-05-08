@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📦 언박싱 마스터</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===================================================
+   🎨 CSS 변수 & 테마
+   =================================================== */
+:root {
+  --bg:            #FFF8F0;
+  --surface:       #FFFFFF;
+  --surface-2:     #FDF6EE;
+  --belt-col-a:    #D8CDBE;
+  --belt-col-b:    #C9BDAC;
+  --cell-empty:    #F3ECE4;
+  --cell-border:   #E6DDD4;
+  --text-1:        #3A2618;
+  --text-2:        #7A5C44;
+  --text-3:        #B39980;
+  --shadow-s:      0 2px 8px  rgba(80,40,10,.08);
+  --shadow-m:      0 4px 20px rgba(80,40,10,.12);
+  --shadow-l:      0 8px 40px rgba(80,40,10,.18);
+  --r:             16px;
+  --r-sm:          8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 50%,  rgba(255,200,150,.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%,  rgba(180,210,255,.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 90%,  rgba(200,255,190,.12) 0%, transparent 40%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 10px 30px;
+  gap: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+}
+
+/* ===================================================
+   HEADER
+   =================================================== */
+.header {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-s);
+}
+
+.hd-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 68px; }
+.hd-label { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-3); }
+.hd-val   { font-size: 22px; font-weight: 900; color: var(--text-1); line-height: 1; }
+.hd-title { font-size: 18px; font-weight: 900; color: var(--text-1); letter-spacing: -.5px; }
+
+/* ===================================================
+   PRESSURE BAR
+   =================================================== */
+.pressure-wrap {
+  width: 100%; max-width: 600px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-s);
+}
+.pressure-label { font-size: 11px; font-weight: 800; color: var(--text-2); white-space: nowrap; }
+.pressure-track {
+  flex: 1; height: 11px;
+  background: #F0E7DC;
+  border-radius: 99px; overflow: hidden;
+}
+.pressure-fill {
+  height: 100%; width: 0%;
+  background: #6BCB77;
+  border-radius: 99px;
+  transition: width .4s ease, background .4s ease;
+}
+.pressure-pct { font-size: 12px; font-weight: 900; color: var(--text-2); min-width: 34px; text-align: right; }
+
+/* ===================================================
+   BELT SECTION
+   =================================================== */
+.belt-section {
+  width: 100%; max-width: 600px;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-s);
+  overflow: hidden;
+}
+.belt-hd {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 14px;
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-3);
+}
+.overflow-badge {
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 800;
+  background: #FFF0E8; color: var(--text-2);
+  transition: background .3s, color .3s;
+}
+.overflow-badge.warn     { background: #FFF3CD; color: #B76E00; }
+.overflow-badge.danger   { background: #FEEAE8; color: #C0392B; animation: pulse .5s infinite; }
+
+.belt-track {
+  position: relative;
+  height: 88px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--belt-col-a) 0px, var(--belt-col-a) 40px,
+    var(--belt-col-b) 40px, var(--belt-col-b) 80px
+  );
+  background-size: 80px 100%;
+  animation: beltRoll .9s linear infinite;
+  overflow: hidden;
+}
+.belt-track::before {
+  content: '';
+  position: absolute; inset: 0 0 auto 0; height: 8px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.12), transparent);
+  z-index: 2; pointer-events: none;
+}
+.belt-track::after {
+  content: '';
+  position: absolute; inset: auto 0 0 0; height: 8px;
+  background: linear-gradient(to top, rgba(0,0,0,.12), transparent);
+  z-index: 2; pointer-events: none;
+}
+@keyframes beltRoll {
+  from { background-position: 0 0; }
+  to   { background-position: -80px 0; }
+}
+
+/* ===================================================
+   BELT BOX
+   =================================================== */
+.belt-box {
+  position: absolute;
+  top: 50%; margin-top: -32px;
+  width: 78px; height: 64px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  border: 3px solid rgba(255,255,255,.55);
+  box-shadow: 0 3px 12px rgba(0,0,0,.18);
+  transition: transform .12s, box-shadow .12s;
+  z-index: 3;
+}
+.belt-box:hover {
+  transform: translateY(-5px) scale(1.06) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+.belt-box .box-emoji  { font-size: 20px; line-height: 1; }
+.belt-box .box-label  { font-size: 8px; font-weight: 900; letter-spacing: .5px; text-transform: uppercase; color: rgba(0,0,0,.45); }
+
+@keyframes boxPop {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  35%  { transform: scale(1.4) rotate(-6deg); opacity: 1; }
+  65%  { transform: scale(.9) rotate(4deg); opacity: .6; }
+  100% { transform: scale(0) rotate(12deg) translateY(-20px); opacity: 0; }
+}
+.belt-box.opening { animation: boxPop .4s ease-in-out forwards; pointer-events: none; }
+
+/* ===== JUICE: UNBOXING ===== */
+.belt-box.unboxing { pointer-events: none; z-index: 10; animation: ubShake .35s ease-out; }
+.belt-box.unboxing .box-emoji,
+.belt-box.unboxing .box-label { opacity: 0; transition: opacity .12s; }
+.belt-box .ub-lid {
+  position: absolute; left: -3px; right: -3px; top: -3px; height: 50%;
+  border-radius: 10px 10px 4px 4px;
+  background: inherit; border: 3px solid rgba(255,255,255,.55); border-bottom: none;
+  transform-origin: top center;
+  animation: ubLid .42s cubic-bezier(.5,-.4,.4,1.6) forwards;
+  z-index: 2;
+}
+.belt-box .ub-item {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  font-size: 26px; font-weight: 900;
+  animation: ubItem .55s cubic-bezier(.3,1.6,.5,1) forwards;
+  z-index: 3; pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.25));
+}
+@keyframes ubShake {
+  0%,100% { transform: translateY(0); }
+  20% { transform: translateY(-3px) rotate(-2deg); }
+  60% { transform: translateY(2px) rotate(2deg); }
+}
+@keyframes ubLid {
+  0%   { transform: rotateX(0) translateY(0); }
+  100% { transform: rotateX(-130deg) translateY(-8px); }
+}
+@keyframes ubItem {
+  0%   { transform: translate(-50%,-30%) scale(0) rotate(-20deg); opacity:0; }
+  35%  { transform: translate(-50%,-160%) scale(1.25) rotate(8deg); opacity:1; }
+  70%  { transform: translate(-50%,-260%) scale(1) rotate(-4deg); opacity:1; }
+  100% { transform: translate(-50%,-380%) scale(.6) rotate(0); opacity:0; }
+}
+
+/* ===== JUICE: FX LAYER (particles + combo banner) ===== */
+#fx-layer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  overflow: hidden;
+}
+.fx-particle {
+  position: absolute; left: 0; top: 0;
+  width: 10px; height: 10px;
+  --tx: 0px; --ty: 0px; --rot: 0deg;
+  animation: fxBurst 750ms cubic-bezier(.2,.7,.3,1) forwards;
+  will-change: transform, opacity;
+}
+.fx-particle.dot { border-radius: 50%; }
+.fx-particle.star {
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 1; color: #FFD93D;
+  text-shadow: 0 0 6px rgba(255,217,61,.9);
+}
+@keyframes fxBurst {
+  0%   { transform: translate(-50%,-50%) scale(.4) rotate(0); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.2) rotate(var(--rot)); opacity: 0; }
+}
+
+.combo-banner {
+  position: fixed; left: 50%; top: 38%;
+  transform: translate(-50%,-50%) scale(.4);
+  font-family: 'Nunito', sans-serif;
+  font-size: 64px; font-weight: 900;
+  letter-spacing: -1.5px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 10000;
+  animation: comboBanner 950ms cubic-bezier(.2,1.5,.4,1) forwards;
+  white-space: nowrap;
+}
+.combo-banner.great   { color:#FF8C42; text-shadow: 0 4px 0 rgba(180,80,10,.35), 0 0 18px rgba(255,140,66,.55); }
+.combo-banner.perfect { color:#FF4D88; text-shadow: 0 4px 0 rgba(170,30,80,.35), 0 0 22px rgba(255,77,136,.6); }
+.combo-banner.amazing {
+  background: linear-gradient(180deg,#FFE76A 0%,#FFB12B 60%,#E0760E 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 0 28px rgba(255,180,40,.65);
+  font-size: 78px;
+}
+@keyframes comboBanner {
+  0%   { transform: translate(-50%,-50%) scale(.4) rotate(-6deg); opacity: 0; }
+  20%  { transform: translate(-50%,-50%) scale(1.2) rotate(2deg); opacity: 1; }
+  35%  { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  75%  { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1.5) rotate(0); opacity: 0; }
+}
+
+/* ===== JUICE: PRESSURE VIGNETTE ===== */
+#vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+  opacity: 0;
+  box-shadow: inset 0 0 140px 50px rgba(220,40,40,.55),
+              inset 0 0 60px 10px rgba(255,80,80,.45);
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(220,30,30,.18) 100%);
+  transition: opacity .25s;
+}
+#vignette.active { animation: vigPulse 1s ease-in-out infinite; }
+@keyframes vigPulse {
+  0%,100% { opacity: .35; }
+  50%     { opacity: 1; }
+}
+
+/* ===================================================
+   GAME AREA (holding + grid)
+   =================================================== */
+.game-area {
+  width: 100%; max-width: 600px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+
+/* --- HOLDING PANEL --- */
+.holding-panel {
+  flex: 0 0 156px;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-s);
+  padding: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 10px;
+  min-height: 180px;
+}
+.panel-title { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text-3); align-self: flex-start; }
+
+.item-shape-preview {
+  display: grid; gap: 3px;
+  margin: auto 0;
+}
+.ip-cell {
+  width: 22px; height: 22px; border-radius: 5px;
+}
+.ip-cell.filled { box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.ip-cell.empty  { background: transparent; }
+
+.item-meta { text-align: center; }
+.item-name { font-size: 12px; font-weight: 800; color: var(--text-2); }
+.item-pts  { font-size: 11px; font-weight: 700; color: var(--text-3); margin-top: 2px; }
+
+.no-item-hint {
+  font-size: 12px; font-weight: 700; line-height: 1.6;
+  color: var(--text-3); text-align: center; margin: auto 0;
+}
+.no-item-hint span { display: block; font-size: 22px; }
+
+/* --- GRID PANEL --- */
+.grid-panel {
+  flex: 1;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-s);
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: box-shadow .35s;
+}
+.grid-panel.warn     { box-shadow: 0 0 0 3px rgba(255,180,0,.4), var(--shadow-m); }
+.grid-panel.critical { box-shadow: 0 0 0 3px rgba(210,40,30,.5), var(--shadow-m); animation: critPulse .75s ease-in-out infinite; }
+@keyframes critPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(210,40,30,.5), var(--shadow-m); }
+  50%     { box-shadow: 0 0 0 7px rgba(210,40,30,.2), var(--shadow-m); }
+}
+
+.grid-panel-header { display: flex; justify-content: space-between; align-items: center; }
+.grid-fill-label   { font-size: 11px; font-weight: 700; color: var(--text-3); }
+
+.grid {
+  display: grid;
+  gap: 4px;
+}
+.cell {
+  aspect-ratio: 1;
+  background: var(--cell-empty);
+  border-radius: 6px;
+  border: 2px solid var(--cell-border);
+  cursor: pointer;
+  transition: background .1s, transform .1s, border-color .1s;
+  position: relative;
+}
+.cell:hover  { border-color: #C4AA94; }
+.cell.filled {
+  border: 2px solid rgba(255,255,255,.45);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.45), inset 0 -2px 0 rgba(0,0,0,.1);
+}
+.cell.ghost-ok  { background: rgba(107,203,119,.38) !important; border-color: rgba(80,180,95,.6) !important; transform: scale(.93); }
+.cell.ghost-bad { background: rgba(210,40,30,.22) !important;  border-color: rgba(210,40,30,.5) !important; }
+
+@keyframes snapAnim {
+  0%   { transform: scale(1.2); filter: brightness(1.5); }
+  55%  { transform: scale(.93); }
+  100% { transform: scale(1);   filter: brightness(1);   }
+}
+.cell.snap { animation: snapAnim .28s ease-out; }
+
+@keyframes clearAnim {
+  0%   { opacity:1; transform: scaleY(1); filter: brightness(1); }
+  45%  { opacity:1; transform: scaleY(1.08); filter: brightness(2); background: #fff; }
+  100% { opacity:0; transform: scaleY(0); }
+}
+.cell.clearing { animation: clearAnim .45s ease-out forwards; }
+
+@keyframes gridShake {
+  0%,100% { transform: translateX(0); }
+  20%  { transform: translateX(-7px); }
+  40%  { transform: translateX(7px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+}
+.grid.shake { animation: gridShake .35s ease-in-out; }
+
+/* ===================================================
+   MAGIC SHELF BUTTON
+   =================================================== */
+.shelf-wrap {
+  width: 100%; max-width: 600px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 5px;
+}
+.magic-btn {
+  position: relative; overflow: hidden;
+  width: 100%; padding: 13px 20px;
+  display: flex; align-items: center;
+  justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, #667EEA, #9B59B6);
+  color: #fff; border: none; border-radius: var(--r);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(102,126,234,.45);
+  transition: transform .15s, box-shadow .15s;
+}
+.magic-btn::before {
+  content: '';
+  position: absolute; top: -50%; left: -60%;
+  width: 40%; height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: skewX(-20deg);
+  animation: shimmer 2.8s infinite;
+}
+@keyframes shimmer { 0%{left:-60%} 100%{left:130%} }
+.magic-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(102,126,234,.55); }
+.magic-btn:active { transform: translateY(1px); }
+.price-tag {
+  background: rgba(255,255,255,.22); padding: 2px 9px;
+  border-radius: 99px; font-size: 12px; font-weight: 900;
+}
+.test-badge {
+  position: absolute; top:-7px; right:-7px;
+  background: #FFD93D; color: #333;
+  font-size: 8px; font-weight: 900;
+  padding: 2px 7px; border-radius: 99px;
+  letter-spacing: .6px; text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.shelf-hint { font-size: 11px; font-weight: 700; color: var(--text-3); }
+
+/* ===================================================
+   FLOATING UI
+   =================================================== */
+/* Notification toast */
+.toast {
+  position: fixed; top: 16px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  padding: 10px 22px;
+  border-radius: var(--r);
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  box-shadow: var(--shadow-l); z-index: 800;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: #D1F7DC; color: #155724; border: 2px solid #A3E4B7; }
+.toast.warn    { background: #FFF3CD; color: #856404; border: 2px solid #FFE07C; }
+.toast.danger  { background: #FEE2E0; color: #842029; border: 2px solid #F5B5B8; }
+
+/* Space warning (centre screen) */
+.space-warn {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  padding: 18px 32px;
+  background: #FEE2E0; color: #9B1C1C;
+  border: 3px solid #FCA5A5;
+  border-radius: 20px; text-align: center;
+  font-size: 20px; font-weight: 900;
+  box-shadow: var(--shadow-l); z-index: 600;
+  pointer-events: none;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.space-warn.show { transform: translate(-50%,-50%) scale(1); }
+
+/* Score popup */
+@keyframes scorePop {
+  0%   { opacity:1; transform: translateY(0) scale(1); }
+  100% { opacity:0; transform: translateY(-50px) scale(1.4); }
+}
+.score-pop {
+  position: fixed; z-index: 700;
+  font-size: 19px; font-weight: 900;
+  text-shadow: 0 2px 6px rgba(0,0,0,.25);
+  pointer-events: none;
+  animation: scorePop .85s ease-out forwards;
+}
+
+/* Combo display */
+@keyframes comboAnim {
+  0%   { opacity:1; transform:translate(-50%,-50%) scale(0); }
+  35%  { opacity:1; transform:translate(-50%,-60%) scale(1.35); }
+  100% { opacity:0; transform:translate(-50%,-90%) scale(1); }
+}
+.combo-pop {
+  position: fixed; top: 45%; left: 50%;
+  font-size: 32px; font-weight: 900;
+  color: #FFD700; text-shadow: 0 3px 12px rgba(0,0,0,.3);
+  pointer-events: none; z-index: 700;
+  animation: comboAnim .85s ease-out forwards;
+}
+
+/* ===================================================
+   GAME OVER OVERLAY
+   =================================================== */
+.go-overlay {
+  position: fixed; inset: 0;
+  background: rgba(40,20,8,.72);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+}
+@keyframes goCardIn {
+  from { transform: scale(.4) rotate(-4deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0); opacity: 1; }
+}
+.go-card {
+  background: var(--surface);
+  border-radius: 24px; padding: 40px 48px;
+  text-align: center; box-shadow: var(--shadow-l);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+  animation: goCardIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+.go-emoji { font-size: 64px; }
+.go-title { font-size: 34px; font-weight: 900; color: var(--text-1); }
+.go-stat  { font-size: 16px; font-weight: 700; color: var(--text-2); }
+.go-sub   { font-size: 13px; color: var(--text-3); }
+.restart-btn {
+  margin-top: 6px; padding: 14px 36px;
+  background: linear-gradient(135deg, #667EEA, #9B59B6);
+  color: #fff; border: none; border-radius: var(--r);
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(102,126,234,.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(102,126,234,.5); }
+
+/* Misc */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+
+/* ===================================================
+   RESPONSIVE
+   =================================================== */
+@media (max-width: 480px) {
+  body { padding: 10px 8px 24px; gap: 8px; }
+  .game-area { flex-direction: column; }
+  .holding-panel { flex: none; width: 100%; flex-direction: row; min-height: auto; padding: 10px 14px; }
+  .item-shape-preview { margin: 0; }
+  .no-item-hint span { display: inline; }
+  .hd-title { font-size: 15px; }
+  .hd-val   { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========= HEADER ========= -->
+<header class="header">
+  <div class="hd-stat">
+    <span class="hd-label">점수</span>
+    <span class="hd-val" id="score-val">0</span>
+  </div>
+  <div class="hd-title">📦 언박싱 마스터</div>
+  <div class="hd-stat">
+    <span class="hd-label">시간</span>
+    <span class="hd-val" id="timer-val">0:00</span>
+  </div>
+</header>
+
+<!-- ========= PRESSURE BAR ========= -->
+<div class="pressure-wrap">
+  <span class="pressure-label">😰 압박감</span>
+  <div class="pressure-track">
+    <div class="pressure-fill" id="pressure-fill"></div>
+  </div>
+  <span class="pressure-pct" id="pressure-pct">0%</span>
+</div>
+
+<!-- ========= BELT SECTION ========= -->
+<section class="belt-section">
+  <div class="belt-hd">
+    <span>📬 컨베이어 벨트</span>
+    <span class="overflow-badge" id="overflow-badge">누락 0개</span>
+  </div>
+  <div class="belt-track" id="belt-track">
+    <div id="belt" style="position:relative;width:100%;height:100%;"></div>
+  </div>
+</section>
+
+<!-- ========= GAME AREA ========= -->
+<div class="game-area">
+
+  <!-- Holding panel -->
+  <aside class="holding-panel" id="holding-panel">
+    <div class="panel-title">현재 아이템</div>
+    <div class="item-shape-preview" id="item-preview"></div>
+    <div class="item-meta" id="item-meta" style="display:none">
+      <div class="item-name" id="item-name"></div>
+      <div class="item-pts"  id="item-pts"></div>
+    </div>
+    <div class="no-item-hint" id="no-item-hint">
+      <span>📦</span>
+      상자를<br>클릭하세요
+    </div>
+  </aside>
+
+  <!-- Grid panel -->
+  <div class="grid-panel" id="grid-panel">
+    <div class="grid-panel-header">
+      <div class="panel-title">진열장 <span id="grid-size-label">5×5</span></div>
+      <div class="grid-fill-label">채움 <span id="grid-fill-pct">0%</span></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+</div>
+
+<!-- ========= MAGIC SHELF BUTTON ========= -->
+<div class="shelf-wrap">
+  <button class="magic-btn" id="magic-shelf-btn" onclick="expandGrid()">
+    🪄 마법의 압축 선반
+    <span class="price-tag">₩1,100</span>
+    <span class="test-badge">TEST</span>
+  </button>
+  <p class="shelf-hint">누르면 진열장이 한 줄 더 늘어납니다 · 압박감 ↓25%</p>
+</div>
+
+<!-- ========= GAME OVER ========= -->
+<div class="go-overlay" id="go-overlay" style="display:none">
+  <div class="go-card">
+    <div class="go-emoji">📦💥</div>
+    <div class="go-title">공간 초과!</div>
+    <div class="go-stat">최종 점수: <strong id="final-score">0</strong></div>
+    <div class="go-sub">생존 시간: <span id="final-time">0:00</span></div>
+    <button class="restart-btn" onclick="restartGame()">🔄 다시 시작</button>
+  </div>
+</div>
+
+<!-- ========= FLOATING UI ========= -->
+<div class="toast"      id="toast"></div>
+<div class="space-warn" id="space-warn">⚠️ 공간이 없어요!</div>
+
+<script>
+/* ============================================================
+   ⚙️  수정 가능한 게임 설정값
+   ──────────────────────────────────────────────────────────
+   아래 숫자를 바꿔서 난이도와 게임 속도를 조절하세요!
+   ============================================================ */
+const CONFIG = {
+  // 그리드
+  GRID_COLS:              5,     // 가로 칸 수
+  GRID_ROWS:              5,     // 초기 세로 칸 수
+
+  // 벨트
+  BELT_SPEED_INITIAL:    38,     // 초기 벨트 속도 (px/초)
+  BELT_SPEED_MAX:       145,     // 최대 벨트 속도 (px/초)
+  BELT_SPEED_INCREMENT:   7,     // 속도 증가량 (매 SPEED_UP_EVERY 초)
+  BOX_SPAWN_INTERVAL:  2700,     // 상자 생성 간격 (ms)
+  BOX_WIDTH:             80,     // 상자 너비 (px) – 이 값과 CSS를 맞춰주세요
+  MAX_BELT_BOXES:         6,     // 벨트 최대 상자 수
+
+  // 난이도 단계 (초)
+  MEDIUM_AT:             30,     // 중간 도형 등장
+  HARD_AT:               65,     // 어려운 도형 등장
+  SPEED_UP_EVERY:        15,     // 속도 증가 주기 (초)
+
+  // 압박감
+  PRESSURE_WARN:         62,     // 경고 압박 수치 (%)
+  PRESSURE_CRIT:         84,     // 위험 압박 수치 (%)
+  PRESSURE_FILL_WEIGHT:  55,     // 그리드 채움이 압박에 미치는 최대 기여값
+  OVERFLOW_PRESSURE:     10,     // 상자 누락 1개당 압박 증가
+  NO_SPACE_PRESSURE:     14,     // 배치 불가 아이템당 압박 증가
+
+  // 점수
+  PTS_PER_CELL:           5,     // 배치 칸당 기본 점수
+  LINE_CLEAR_BONUS:     120,     // 줄 클리어 보너스
+  COMBO_WINDOW_MS:     4200,     // 콤보 유효 시간 (ms)
+};
+/* ============================================================ */
+
+/* ===  도형 정의  === */
+const SHAPES = {
+  easy: [
+    { key:'dot',  cells:[[1]],              label:'소형 박스',  pts: 2 },
+    { key:'h2',   cells:[[1,1]],            label:'가로 2칸',   pts: 3 },
+    { key:'v2',   cells:[[1],[1]],          label:'세로 2칸',   pts: 3 },
+  ],
+  medium: [
+    { key:'h3',   cells:[[1,1,1]],          label:'가로 3칸',   pts: 5 },
+    { key:'v3',   cells:[[1],[1],[1]],      label:'세로 3칸',   pts: 5 },
+    { key:'sq',   cells:[[1,1],[1,1]],      label:'정사각형',   pts: 7 },
+    { key:'l2',   cells:[[1,0],[1,1]],      label:'ㄱ 소형',    pts: 6 },
+    { key:'r2',   cells:[[0,1],[1,1]],      label:'ㄴ 소형',    pts: 6 },
+  ],
+  hard: [
+    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'L자형',   pts:10 },
+    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'J자형',   pts:10 },
+    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'T자형',   pts:11 },
+    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'S자형',   pts:12 },
+    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'Z자형',   pts:12 },
+  ],
+};
+
+/* === 상자 색상 팔레트 === */
+const COLORS = [
+  { bg:'#FFB3C6', dk:'#D97090', name:'핑크' },
+  { bg:'#B5EAD7', dk:'#72C6A4', name:'민트' },
+  { bg:'#AEC6CF', dk:'#6E9EAD', name:'블루' },
+  { bg:'#FFDAC1', dk:'#E0A06A', name:'피치' },
+  { bg:'#E2F0CB', dk:'#99C255', name:'연두' },
+  { bg:'#C7CEEA', dk:'#8590CC', name:'라벤더' },
+  { bg:'#FFD1DC', dk:'#E8899A', name:'로즈' },
+  { bg:'#B5D5FF', dk:'#6DA8E8', name:'스카이' },
+];
+
+/* ===================================================
+   🎮  GAME STATE
+   =================================================== */
+let S = {};   // game state object
+
+function makeState() {
+  return {
+    grid:          [],
+    gridRows:      CONFIG.GRID_ROWS,
+    gridCols:      CONFIG.GRID_COLS,
+
+    boxes:         [],
+    beltSpeed:     CONFIG.BELT_SPEED_INITIAL,
+    boxCounter:    0,
+    overflowCount: 0,
+    lastSpawn:     0,
+    lastSpeedUp:   0,
+
+    currentItem:   null,
+    hoveredCell:   { r:-1, c:-1 },
+
+    score:         0,
+    timeElapsed:   0,
+    pressure:      0,
+
+    combo:         0,
+    lastPlaceTs:   0,
+
+    gameOver:      false,
+    running:       false,
+    lastFrame:     0,
+  };
+}
+
+/* ===================================================
+   🔊  WEB AUDIO (synthetic SFX)
+   =================================================== */
+let _ctx = null;
+function AC() {
+  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  return _ctx;
+}
+
+function playSound(type) {
+  try {
+    const ctx = AC();
+    const defs = {
+      click:    { notes:[420,600],           dt:.07,  wave:'sine',     vol:.28 },
+      place:    { notes:[320,280,450],        dt:.10,  wave:'sine',     vol:.38 },
+      clear:    { notes:[440,550,660,880],    dt:.07,  wave:'sine',     vol:.32 },
+      error:    { notes:[220,170],            dt:.11,  wave:'sawtooth', vol:.18 },
+      overflow: { notes:[190,140],            dt:.14,  wave:'sawtooth', vol:.20 },
+      expand:   { notes:[350,440,550,660,880],dt:.09,  wave:'sine',     vol:.38 },
+      gameover: { notes:[440,380,320,260,200],dt:.22,  wave:'sine',     vol:.32 },
+    };
+    const d = defs[type]; if (!d) return;
+    d.notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g   = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = d.wave;
+      const t0 = ctx.currentTime + i * d.dt * .85;
+      osc.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(d.vol, t0);
+      g.gain.exponentialRampToValueAtTime(.001, t0 + d.dt);
+      osc.start(t0); osc.stop(t0 + d.dt + .01);
+    });
+  } catch(_) {}
+}
+
+/* ===================================================
+   🧩  GRID HELPERS
+   =================================================== */
+function initGrid() {
+  S.grid = Array.from({ length: S.gridRows }, () => Array(S.gridCols).fill(null));
+}
+
+function renderGrid() {
+  const g = document.getElementById('grid');
+  g.style.gridTemplateColumns = `repeat(${S.gridCols}, 1fr)`;
+  g.innerHTML = '';
+
+  for (let r = 0; r < S.gridRows; r++) {
+    for (let c = 0; c < S.gridCols; c++) {
+      const el = document.createElement('div');
+      el.className = 'cell';
+      el.dataset.r = r; el.dataset.c = c;
+
+      if (S.grid[r][c]) {
+        applyFilledStyle(el, S.grid[r][c]);
+      }
+
+      el.addEventListener('mouseenter', () => onHover(r, c));
+      el.addEventListener('mouseleave', () => onLeave());
+      el.addEventListener('click',      () => onCellClick(r, c));
+      g.appendChild(el);
+    }
+  }
+
+  updateFillLabel();
+  updatePanelGlow();
+  document.getElementById('grid-size-label').textContent = `${S.gridCols}×${S.gridRows}`;
+}
+
+function applyFilledStyle(el, color) {
+  el.classList.add('filled');
+  el.style.background    = color.bg;
+  el.style.borderColor   = color.dk;
+}
+
+function getCell(r, c) {
+  return document.querySelector(`#grid [data-r="${r}"][data-c="${c}"]`);
+}
+
+function updateFillLabel() {
+  const total  = S.gridRows * S.gridCols;
+  const filled = S.grid.flat().filter(Boolean).length;
+  const pct    = Math.round(filled / total * 100);
+  document.getElementById('grid-fill-pct').textContent = pct + '%';
+}
+
+function updatePanelGlow() {
+  const p = document.getElementById('grid-panel');
+  p.classList.remove('warn','critical');
+  if      (S.pressure >= CONFIG.PRESSURE_CRIT) p.classList.add('critical');
+  else if (S.pressure >= CONFIG.PRESSURE_WARN) p.classList.add('warn');
+}
+
+/* ===================================================
+   🗺️  ITEM PREVIEW (holding panel)
+   =================================================== */
+function renderItemPreview() {
+  const prevEl  = document.getElementById('item-preview');
+  const metaEl  = document.getElementById('item-meta');
+  const hintEl  = document.getElementById('no-item-hint');
+  const nameEl  = document.getElementById('item-name');
+  const ptsEl   = document.getElementById('item-pts');
+
+  if (!S.currentItem) {
+    prevEl.innerHTML   = '';
+    metaEl.style.display = 'none';
+    hintEl.style.display = '';
+    return;
+  }
+
+  hintEl.style.display = 'none';
+  metaEl.style.display = '';
+
+  const { shape, color } = S.currentItem;
+  const rows = shape.cells.length;
+  const cols = shape.cells[0].length;
+
+  prevEl.style.gridTemplateColumns = `repeat(${cols}, 22px)`;
+  prevEl.style.gridTemplateRows    = `repeat(${rows}, 22px)`;
+  prevEl.innerHTML = '';
+
+  shape.cells.forEach(row => row.forEach(v => {
+    const d = document.createElement('div');
+    d.className = `ip-cell ${v ? 'filled' : 'empty'}`;
+    if (v) { d.style.background = color.bg; d.style.borderRadius = '5px'; d.style.boxShadow = `0 2px 6px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5)`; }
+    prevEl.appendChild(d);
+  }));
+
+  const cellCount = shape.cells.flat().reduce((a,v)=>a+v,0);
+  nameEl.textContent = shape.label;
+  ptsEl.textContent  = `+${shape.pts * cellCount * CONFIG.PTS_PER_CELL} 점`;
+}
+
+/* ===================================================
+   ✅  PLACEMENT LOGIC
+   =================================================== */
+function canPlace(shape, row, col) {
+  for (let r = 0; r < shape.cells.length; r++)
+    for (let c = 0; c < shape.cells[r].length; c++)
+      if (shape.cells[r][c]) {
+        const gr = row + r, gc = col + c;
+        if (gr < 0 || gr >= S.gridRows || gc < 0 || gc >= S.gridCols) return false;
+        if (S.grid[gr][gc] !== null) return false;
+      }
+  return true;
+}
+
+function fitsAnywhere(shape) {
+  for (let r = 0; r < S.gridRows; r++)
+    for (let c = 0; c < S.gridCols; c++)
+      if (canPlace(shape, r, c)) return true;
+  return false;
+}
+
+/* ===================================================
+   🖱️  GRID MOUSE EVENTS
+   =================================================== */
+function clearGhost() {
+  document.querySelectorAll('#grid .cell').forEach(el => {
+    el.classList.remove('ghost-ok','ghost-bad');
+  });
+}
+
+function onHover(r, c) {
+  S.hoveredCell = { r, c };
+  clearGhost();
+  if (!S.currentItem) return;
+
+  const { shape } = S.currentItem;
+  const ok = canPlace(shape, r, c);
+
+  for (let dr = 0; dr < shape.cells.length; dr++)
+    for (let dc = 0; dc < shape.cells[dr].length; dc++)
+      if (shape.cells[dr][dc]) {
+        const el = getCell(r + dr, c + dc);
+        if (el) el.classList.add(ok ? 'ghost-ok' : 'ghost-bad');
+      }
+}
+
+function onLeave() {
+  S.hoveredCell = { r:-1, c:-1 };
+  clearGhost();
+}
+
+function onCellClick(r, c) {
+  if (!S.currentItem || S.gameOver) return;
+
+  const { shape, color } = S.currentItem;
+
+  if (!canPlace(shape, r, c)) {
+    playSound('error');
+    document.getElementById('grid').classList.add('shake');
+    setTimeout(() => document.getElementById('grid').classList.remove('shake'), 380);
+    return;
+  }
+
+  // ── place cells ──
+  const placedCells = [];
+  for (let dr = 0; dr < shape.cells.length; dr++)
+    for (let dc = 0; dc < shape.cells[dr].length; dc++)
+      if (shape.cells[dr][dc]) {
+        const gr = r + dr, gc = c + dc;
+        S.grid[gr][gc] = color;
+        placedCells.push({ gr, gc });
+      }
+
+  // ── score & combo ──
+  const now = performance.now();
+  const cellCount = placedCells.length;
+  let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
+
+  if (now - S.lastPlaceTs < CONFIG.COMBO_WINDOW_MS) {
+    S.combo++;
+    if (S.combo >= 3) {
+      pts = Math.round(pts * (1 + S.combo * .18));
+      spawnCombo(S.combo);
+    }
+  } else {
+    S.combo = 1;
+  }
+  S.lastPlaceTs = now;
+  S.score += pts;
+  playSound('place');
+
+  // ── animate cells ──
+  clearGhost();
+  placedCells.forEach(({ gr, gc }, i) => {
+    const el = getCell(gr, gc);
+    if (!el) return;
+    applyFilledStyle(el, color);
+    setTimeout(() => {
+      el.classList.add('snap');
+      setTimeout(() => el.classList.remove('snap'), 320);
+      spawnPlaceParticles(el, color);
+    }, i * 18);
+  });
+
+  // ── score popup ──
+  spawnScorePop(pts, r, c);
+
+  S.currentItem = null;
+  renderItemPreview();
+
+  // ── check line clears (brief delay for snap anim) ──
+  setTimeout(checkLineClear, 120);
+
+  updateFillLabel();
+  recalcPressure();
+  updatePanelGlow();
+  updateScoreUI();
+}
+
+/* ===================================================
+   💥  LINE CLEAR
+   =================================================== */
+function checkLineClear() {
+  const full = [];
+  for (let r = 0; r < S.gridRows; r++)
+    if (S.grid[r].every(v => v !== null)) full.push(r);
+
+  if (!full.length) return;
+
+  playSound('clear');
+
+  // Flash animation
+  full.forEach(r => {
+    for (let c = 0; c < S.gridCols; c++) {
+      const el = getCell(r, c);
+      if (el) el.classList.add('clearing');
+    }
+  });
+
+  setTimeout(() => {
+    // Remove rows (descending to keep indices valid)
+    [...full].sort((a,b)=>b-a).forEach(r => {
+      S.grid.splice(r, 1);
+      S.grid.unshift(Array(S.gridCols).fill(null));
+    });
+
+    const bonus = full.length * CONFIG.LINE_CLEAR_BONUS * (full.length > 1 ? 1.5 : 1);
+    S.score += Math.round(bonus);
+
+    // Pressure relief
+    S.pressure = Math.max(0, S.pressure - full.length * 16);
+
+    renderGrid();
+    updateScoreUI();
+    showToast(`${full.length}줄 클리어! +${Math.round(bonus)}점 🎉`, 'success');
+  }, 480);
+}
+
+/* ===================================================
+   📬  BOX SPAWNING & BELT UPDATE
+   =================================================== */
+function pickShape() {
+  let pool = [...SHAPES.easy];
+  if (S.timeElapsed >= CONFIG.MEDIUM_AT) pool = pool.concat(SHAPES.medium);
+  if (S.timeElapsed >= CONFIG.HARD_AT)   pool = pool.concat(SHAPES.hard);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function spawnBox() {
+  const beltEl = document.getElementById('belt');
+  const beltW  = beltEl.parentElement.offsetWidth || 560;
+
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const shape = pickShape();
+  const id    = S.boxCounter++;
+
+  const el = document.createElement('div');
+  el.className = 'belt-box';
+  el.id = `box-${id}`;
+  el.style.background = color.bg;
+  el.style.left = beltW + 'px';
+  el.innerHTML = `<div class="box-emoji">📦</div><div class="box-label">${color.name}</div>`;
+  el.addEventListener('click', () => openBox(id));
+
+  beltEl.appendChild(el);
+  S.boxes.push({ id, x: beltW, color, shape, el });
+}
+
+function openBox(id) {
+  const idx = S.boxes.findIndex(b => b.id === id);
+  if (idx === -1) return;
+
+  // Already holding? Show hint then return
+  if (S.currentItem) {
+    showToast('⚠️ 먼저 아이템을 진열장에 배치하세요!', 'warn');
+    return;
+  }
+
+  const box = S.boxes.splice(idx, 1)[0];
+
+  // ── unboxing animation: lid pops open + item shoots up ──
+  box.el.classList.add('unboxing');
+  const lid = document.createElement('div');
+  lid.className = 'ub-lid';
+  const item = document.createElement('div');
+  item.className = 'ub-item';
+  item.textContent = '🎁';
+  item.style.color = box.color.dk;
+  box.el.appendChild(lid);
+  box.el.appendChild(item);
+
+  playSound('click');
+
+  setTimeout(() => {
+    box.el.remove();
+    S.currentItem = { shape: box.shape, color: box.color };
+    renderItemPreview();
+
+    // Check if item fits anywhere
+    if (!fitsAnywhere(S.currentItem.shape)) {
+      setTimeout(() => {
+        showSpaceWarn();
+        S.pressure = Math.min(100, S.pressure + CONFIG.NO_SPACE_PRESSURE);
+        recalcPressure();
+      }, 150);
+    }
+  }, 380);
+}
+
+function updateBelt(dt) {
+  const remove = [];
+
+  S.boxes.forEach((box, i) => {
+    box.x -= S.beltSpeed * dt;
+
+    if (box.x < -(CONFIG.BOX_WIDTH + 10)) {
+      remove.push(i);
+      box.el.remove();
+      S.overflowCount++;
+      S.pressure = Math.min(100, S.pressure + CONFIG.OVERFLOW_PRESSURE);
+      playSound('overflow');
+      updateOverflowBadge();
+    } else {
+      box.el.style.left = box.x + 'px';
+    }
+  });
+
+  remove.reverse().forEach(i => S.boxes.splice(i, 1));
+}
+
+function updateOverflowBadge() {
+  const el = document.getElementById('overflow-badge');
+  el.textContent = `누락 ${S.overflowCount}개`;
+  el.classList.remove('warn','danger');
+  if      (S.overflowCount >= 5) el.classList.add('danger');
+  else if (S.overflowCount >= 3) el.classList.add('warn');
+}
+
+/* ===================================================
+   📊  PRESSURE SYSTEM
+   =================================================== */
+function recalcPressure() {
+  const total  = S.gridRows * S.gridCols;
+  const filled = S.grid.flat().filter(Boolean).length;
+  const fillPct = filled / total * 100;
+
+  // Grid contribution (max = PRESSURE_FILL_WEIGHT)
+  const gridPart     = fillPct * (CONFIG.PRESSURE_FILL_WEIGHT / 100);
+  // Overflow contribution
+  const overflowPart = Math.min(S.overflowCount * CONFIG.OVERFLOW_PRESSURE, 45);
+
+  const target = gridPart + overflowPart;
+  // Never decrease automatically when already high
+  if (target > S.pressure) S.pressure = target;
+  else S.pressure = Math.max(0, S.pressure - 0.04); // tiny slow decay
+
+  S.pressure = Math.min(100, S.pressure);
+
+  // Update bar
+  const fill = document.getElementById('pressure-fill');
+  const pct  = document.getElementById('pressure-pct');
+  fill.style.width = S.pressure + '%';
+  pct.textContent  = Math.round(S.pressure) + '%';
+
+  if      (S.pressure >= CONFIG.PRESSURE_CRIT) { fill.style.background = '#E63946'; }
+  else if (S.pressure >= CONFIG.PRESSURE_WARN) { fill.style.background = '#FFB703'; }
+  else                                          { fill.style.background = '#6BCB77'; }
+
+  // Show warnings
+  if (S.pressure >= CONFIG.PRESSURE_CRIT && !S.gameOver) {
+    document.getElementById('grid-panel').classList.add('critical');
+  }
+
+  if (S.pressure >= 100) triggerGameOver();
+  updatePanelGlow();
+  updateVignette();
+}
+
+/* ===================================================
+   ✨  JUICE FX  (particles + combo banner + vignette)
+   =================================================== */
+function fxLayer() {
+  let l = document.getElementById('fx-layer');
+  if (!l) { l = document.createElement('div'); l.id = 'fx-layer'; document.body.appendChild(l); }
+  return l;
+}
+
+function spawnPlaceParticles(cellEl, color) {
+  const layer = fxLayer();
+  const rect = cellEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const count = 9 + Math.floor(Math.random() * 4);
+  const palette = [color.dk, color.bg, '#FFFFFF', '#FFD93D'];
+
+  for (let i = 0; i < count; i++) {
+    const isStar = Math.random() < 0.35;
+    const p = document.createElement('div');
+    p.className = 'fx-particle ' + (isStar ? 'star' : 'dot');
+    if (isStar) {
+      p.textContent = '★';
+    } else {
+      const c = palette[Math.floor(Math.random() * palette.length)];
+      p.style.background = c;
+      p.style.boxShadow = `0 0 8px ${c}`;
+    }
+    const angle = (Math.PI * 2) * (i / count) + Math.random() * 0.6;
+    const dist = 40 + Math.random() * 55;
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    p.style.setProperty('--rot', (Math.random() * 540 - 270) + 'deg');
+    layer.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+}
+
+let _vigEl = null;
+function updateVignette() {
+  if (!_vigEl) {
+    _vigEl = document.createElement('div');
+    _vigEl.id = 'vignette';
+    document.body.appendChild(_vigEl);
+  }
+  const on = S.pressure >= CONFIG.PRESSURE_CRIT && !S.gameOver;
+  _vigEl.classList.toggle('active', on);
+}
+
+let _comboBannerEl = null;
+function spawnComboBanner(combo) {
+  let label, cls;
+  if (combo >= 7)      { label = 'AMAZING!'; cls = 'amazing'; }
+  else if (combo >= 5) { label = 'PERFECT!'; cls = 'perfect'; }
+  else                 { label = 'GREAT!';   cls = 'great';   }
+
+  if (_comboBannerEl) _comboBannerEl.remove();
+  const el = document.createElement('div');
+  el.className = 'combo-banner ' + cls;
+  el.textContent = label;
+  document.body.appendChild(el);
+  _comboBannerEl = el;
+  setTimeout(() => { if (el === _comboBannerEl) _comboBannerEl = null; el.remove(); }, 950);
+}
+
+/* ===================================================
+   🏆  SCORE & TIMER
+   =================================================== */
+function updateScoreUI() {
+  document.getElementById('score-val').textContent = S.score.toLocaleString();
+}
+
+function updateTimer() {
+  const m = Math.floor(S.timeElapsed / 60);
+  const s = Math.floor(S.timeElapsed % 60);
+  document.getElementById('timer-val').textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+
+/* ===================================================
+   🪄  MAGIC SHELF (IAP logic)
+   =================================================== */
+function expandGrid() {
+  if (S.gameOver) return;
+
+  S.gridRows++;
+  S.grid.push(Array(S.gridCols).fill(null));
+
+  // Big pressure relief
+  S.pressure = Math.max(0, S.pressure - 25);
+  recalcPressure();
+  renderGrid();
+  playSound('expand');
+
+  showToast(`✨ 진열장이 ${S.gridCols}×${S.gridRows}으로 확장됐어요!`, 'success');
+
+  const btn = document.getElementById('magic-shelf-btn');
+  btn.style.transform = 'scale(.94)';
+  setTimeout(() => btn.style.transform = '', 200);
+}
+
+/* ===================================================
+   💀  GAME OVER
+   =================================================== */
+function triggerGameOver() {
+  if (S.gameOver) return;
+  S.gameOver = true;
+  S.running  = false;
+  playSound('gameover');
+
+  document.getElementById('go-overlay').style.display  = 'flex';
+  document.getElementById('final-score').textContent   = S.score.toLocaleString();
+  const m = Math.floor(S.timeElapsed/60), s = Math.floor(S.timeElapsed%60);
+  document.getElementById('final-time').textContent    = `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function restartGame() {
+  document.getElementById('go-overlay').style.display = 'none';
+  // Clear belt boxes
+  document.getElementById('belt').innerHTML = '';
+  S = makeState();
+  initGrid();
+  renderGrid();
+  renderItemPreview();
+  updateScoreUI();
+  updateTimer();
+  updateOverflowBadge();
+  recalcPressure();
+  document.getElementById('overflow-badge').textContent = '누락 0개';
+  document.getElementById('overflow-badge').className   = 'overflow-badge';
+
+  // Kick off
+  setTimeout(spawnBox, 600);
+  S.running   = true;
+  S.lastSpawn = performance.now();
+  requestAnimationFrame(ts => { S.lastFrame = ts; loop(ts); });
+}
+
+/* ===================================================
+   🎬  FLOATING EFFECTS
+   =================================================== */
+let _toastTm = null;
+function showToast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = `toast ${type} show`;
+  if (_toastTm) clearTimeout(_toastTm);
+  _toastTm = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+let _swTm = null;
+function showSpaceWarn() {
+  const el = document.getElementById('space-warn');
+  el.classList.add('show');
+  if (_swTm) clearTimeout(_swTm);
+  _swTm = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+function spawnScorePop(pts, r, c) {
+  const gridEl = document.getElementById('grid');
+  const rect   = gridEl.getBoundingClientRect();
+  const cols   = S.gridCols;
+  const cw     = rect.width  / cols;
+  const rh     = rect.height / S.gridRows;
+  const x = rect.left + c * cw + cw / 2;
+  const y = rect.top  + r * rh;
+
+  const el = document.createElement('div');
+  el.className = 'score-pop';
+  el.textContent = `+${pts}`;
+  el.style.left  = x + 'px';
+  el.style.top   = y + 'px';
+  el.style.color = '#3CC44A';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function spawnCombo(n) {
+  const el = document.createElement('div');
+  el.className = 'combo-pop';
+  el.textContent = `${n}× COMBO! 🔥`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+  spawnComboBanner(n);
+}
+
+/* ===================================================
+   🔄  MAIN GAME LOOP
+   =================================================== */
+function loop(ts) {
+  if (!S.running) return;
+
+  const dt = Math.min((ts - S.lastFrame) / 1000, .1);
+  S.lastFrame    = ts;
+  S.timeElapsed += dt;
+
+  // Spawn boxes
+  if (ts - S.lastSpawn > CONFIG.BOX_SPAWN_INTERVAL && S.boxes.length < CONFIG.MAX_BELT_BOXES) {
+    spawnBox();
+    S.lastSpawn = ts;
+  }
+
+  // Speed up
+  if (S.timeElapsed - S.lastSpeedUp >= CONFIG.SPEED_UP_EVERY) {
+    S.beltSpeed   = Math.min(CONFIG.BELT_SPEED_MAX, S.beltSpeed + CONFIG.BELT_SPEED_INCREMENT);
+    S.lastSpeedUp = S.timeElapsed;
+    if (S.beltSpeed > CONFIG.BELT_SPEED_INITIAL + 10) {
+      showToast('⚡ 벨트 속도가 빨라졌어요!', 'warn');
+    }
+  }
+
+  updateBelt(dt);
+  recalcPressure();
+  updateTimer();
+
+  requestAnimationFrame(loop);
+}
+
+/* ===================================================
+   🚀  INIT
+   =================================================== */
+window.addEventListener('load', () => {
+  S = makeState();
+  initGrid();
+  renderGrid();
+  renderItemPreview();
+  updateScoreUI();
+  updateTimer();
+  updateOverflowBadge();
+  recalcPressure();
+
+  // First box after short delay for drama
+  setTimeout(spawnBox, 700);
+  S.running   = true;
+  S.lastSpawn = performance.now();
+
+  requestAnimationFrame(ts => { S.lastFrame = ts; loop(ts); });
+});
+</script>
+</body>
+</html>
