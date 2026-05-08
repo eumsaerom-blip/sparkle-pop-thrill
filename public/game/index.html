@@ -795,6 +795,16 @@ body {
 <div class="toast"      id="toast"></div>
 <div class="space-warn" id="space-warn">⚠️ 공간이 없어요!</div>
 
+<!-- ========= DEX MODAL ========= -->
+<div class="dex-modal" id="dex-modal" onclick="if(event.target===this)closeDex()">
+  <div class="dex-card">
+    <h2>📖 컬렉션 도감</h2>
+    <div class="dex-sub" id="dex-sub">0 / 0 발견</div>
+    <div class="dex-grid" id="dex-grid"></div>
+    <button class="dex-close" onclick="closeDex()">닫기</button>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    ⚙️  수정 가능한 게임 설정값
