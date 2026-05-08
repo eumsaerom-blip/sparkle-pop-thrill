@@ -1650,6 +1650,7 @@ function updateTimer() {
    =================================================== */
 function expandGrid() {
   if (S.gameOver) return;
+  if (S.trialActive) { showToast('체험판이 끝난 뒤 사용해주세요!', 'warn'); return; }
 
   S.gridRows++;
   S.grid.push(Array(S.gridCols).fill(null));
