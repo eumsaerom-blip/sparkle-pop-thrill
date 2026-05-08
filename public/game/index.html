@@ -341,6 +341,95 @@ body {
 .score-pop.gold { font-size: 28px !important; text-shadow: 0 0 14px rgba(255,200,40,.9); }
 
 /* ===================================================
+   THEME: TRIAL BOX (체험판)
+   =================================================== */
+.belt-box.trial {
+  background: linear-gradient(135deg, #E0D4FF 0%, #B89BFF 50%, #7B5CCF 100%) !important;
+  border-color: #F3ECFF !important;
+  box-shadow: 0 0 18px rgba(123,92,207,.65), 0 4px 14px rgba(80,50,160,.45);
+  animation: trialPulse 1s ease-in-out infinite;
+}
+.belt-box.trial .box-label { color: #fff; }
+.belt-box.trial::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 12px; pointer-events: none;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: goldShimmer 1.4s linear infinite;
+  mix-blend-mode: overlay;
+}
+@keyframes trialPulse {
+  0%,100% { transform: translateY(0); box-shadow: 0 0 18px rgba(123,92,207,.65), 0 4px 14px rgba(80,50,160,.45); }
+  50%     { transform: translateY(-3px); box-shadow: 0 0 32px rgba(170,130,255,.95), 0 6px 18px rgba(80,50,160,.55); }
+}
+.trial-spark { font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+
+/* 체험판 카운트다운 배지 */
+#trial-badge {
+  position: fixed; top: 64px; right: 14px;
+  background: linear-gradient(135deg,#7B5CCF,#B89BFF);
+  color: #fff; font-family:'Nunito',sans-serif;
+  font-size: 14px; font-weight: 900;
+  padding: 8px 14px; border-radius: 99px;
+  box-shadow: 0 6px 20px rgba(123,92,207,.55);
+  z-index: 9000; opacity: 0;
+  transform: translateY(-12px) scale(.85);
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+}
+#trial-badge.show { opacity: 1; transform: translateY(0) scale(1); animation: trialBadgePulse 1s ease-in-out infinite; }
+@keyframes trialBadgePulse {
+  0%,100% { box-shadow: 0 6px 20px rgba(123,92,207,.55); }
+  50%     { box-shadow: 0 6px 28px rgba(170,130,255,.9); }
+}
+
+/* ===================================================
+   SALE BUBBLE (압박감 ≥ 90%)
+   =================================================== */
+.sale-bubble {
+  position: absolute;
+  top: -34px; right: 8px;
+  background: linear-gradient(135deg, #FF4D6D, #FF9558);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 900;
+  padding: 7px 13px;
+  border-radius: 14px;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(255,77,109,.55), 0 0 0 3px rgba(255,255,255,.6);
+  z-index: 50;
+  animation: saleBob .8s ease-in-out infinite alternate, saleIn .35s cubic-bezier(.2,1.6,.4,1) backwards;
+  letter-spacing: -.3px;
+  text-shadow: 0 1px 1px rgba(120,20,40,.4);
+}
+.sale-bubble::after {
+  content: '';
+  position: absolute; bottom: -7px; right: 22px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #FF6F62;
+  filter: drop-shadow(0 2px 1px rgba(255,77,109,.4));
+}
+@keyframes saleBob {
+  0%   { transform: translateY(0) rotate(-3deg); }
+  100% { transform: translateY(-4px) rotate(3deg); }
+}
+@keyframes saleIn {
+  0%   { transform: translateY(8px) scale(.4); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.shelf-wrap { position: relative; }
+
+/* 시선 끌기 펄스 (체험 종료 후 buy 버튼) */
+.magic-btn.attention {
+  animation: shelfAttention .6s ease-in-out 6, shimmer 2.8s infinite;
+}
+@keyframes shelfAttention {
+  0%,100% { transform: translateY(0) scale(1); box-shadow: 0 4px 20px rgba(102,126,234,.45); }
+  50%     { transform: translateY(-4px) scale(1.04); box-shadow: 0 12px 38px rgba(155,89,182,.85), 0 0 0 4px rgba(255,255,255,.5); }
+}
+
+/* ===================================================
    COLLECTION (도감)
    =================================================== */
 .dex-btn {
@@ -771,7 +860,7 @@ body {
 </div>
 
 <!-- ========= MAGIC SHELF BUTTON ========= -->
-<div class="shelf-wrap">
+<div class="shelf-wrap" id="shelf-wrap">
   <button class="magic-btn" id="magic-shelf-btn" onclick="expandGrid()">
     🪄 마법의 압축 선반
     <span class="price-tag">₩1,100</span>
@@ -818,23 +907,26 @@ const CONFIG = {
 
   // 벨트
   BELT_SPEED_INITIAL:    38,     // 초기 벨트 속도 (px/초)
-  BELT_SPEED_MAX:       145,     // 최대 벨트 속도 (px/초)
-  BELT_SPEED_INCREMENT:   7,     // 속도 증가량 (매 SPEED_UP_EVERY 초)
-  BOX_SPAWN_INTERVAL:  2700,     // 상자 생성 간격 (ms)
+  BELT_SPEED_MAX:       190,     // 최대 벨트 속도 (px/초)
+  BELT_SPEED_INCREMENT:  11,     // 속도 증가량 (매 SPEED_UP_EVERY 초)
+  BOX_SPAWN_INTERVAL:  2700,     // 상자 생성 기본 간격 (ms) – 시간 따라 줄어듦
+  BOX_SPAWN_MIN:       1100,     // 상자 생성 최소 간격 (ms)
+  BOX_SPAWN_RAMP:        10,     // 1초마다 줄어드는 ms (가속 곡선)
   BOX_WIDTH:             80,     // 상자 너비 (px) – 이 값과 CSS를 맞춰주세요
   MAX_BELT_BOXES:         6,     // 벨트 최대 상자 수
 
   // 난이도 단계 (초)
-  MEDIUM_AT:             30,     // 중간 도형 등장
-  HARD_AT:               65,     // 어려운 도형 등장
-  SPEED_UP_EVERY:        15,     // 속도 증가 주기 (초)
+  MEDIUM_AT:             25,     // 중간 도형 등장
+  HARD_AT:               55,     // 어려운 도형 등장
+  SPEED_UP_EVERY:        11,     // 속도 증가 주기 (초)
 
   // 압박감
   PRESSURE_WARN:         62,     // 경고 압박 수치 (%)
   PRESSURE_CRIT:         84,     // 위험 압박 수치 (%)
-  PRESSURE_FILL_WEIGHT:  55,     // 그리드 채움이 압박에 미치는 최대 기여값
-  OVERFLOW_PRESSURE:     10,     // 상자 누락 1개당 압박 증가
+  PRESSURE_FILL_WEIGHT:  60,     // 그리드 채움이 압박에 미치는 최대 기여값
+  OVERFLOW_PRESSURE:     12,     // 상자 누락 1개당 압박 증가
   NO_SPACE_PRESSURE:     14,     // 배치 불가 아이템당 압박 증가
+  SALE_AT:               90,     // 압박감 ≥ 이 값에서 할인 말풍선 등장
 
   // 점수
   PTS_PER_CELL:           5,     // 배치 칸당 기본 점수
@@ -844,6 +936,10 @@ const CONFIG = {
   // 희귀도
   GOLD_BOX_CHANCE:     0.045,    // 골드 상자 출현 확률 (4.5%)
   GOLD_MULTIPLIER:        5,     // 골드 아이템 점수 배수
+
+  // 체험판
+  TRIAL_BOX_CHANCE:    0.035,    // 체험판(맛보기) 상자 출현 확률
+  TRIAL_DURATION_MS: 10000,      // 체험판 진열장 2배 지속시간 (ms)
 };
 /* ============================================================ */
 
@@ -916,6 +1012,12 @@ function makeState() {
     gameOver:      false,
     running:       false,
     lastFrame:     0,
+
+    // 체험판 (맛보기 확장)
+    trialActive:   false,
+    trialAddedRows:0,
+    trialEndTs:    0,
+    trialUsed:     false,   // 게임당 1회만 등장하도록 제한
   };
 }
 
@@ -1248,22 +1350,37 @@ function spawnBox() {
   const beltEl = document.getElementById('belt');
   const beltW  = beltEl.parentElement.offsetWidth || 560;
 
-  const isGold = Math.random() < CONFIG.GOLD_BOX_CHANCE;
-  const color  = isGold ? GOLD_COLOR : COLORS[Math.floor(Math.random() * COLORS.length)];
-  const shape  = pickShape();
-  const id     = S.boxCounter++;
+  // 체험판 상자: 게임당 1회만, 일정 압박감 이상에서만 등장
+  const isTrial = !S.trialUsed && !S.trialActive
+                 && S.timeElapsed > 25
+                 && S.pressure > 35
+                 && Math.random() < CONFIG.TRIAL_BOX_CHANCE;
+  const isGold  = !isTrial && Math.random() < CONFIG.GOLD_BOX_CHANCE;
+  const color   = isTrial ? { bg:'#E0D4FF', dk:'#7B5CCF', name:'TRIAL' }
+                : isGold  ? GOLD_COLOR
+                : COLORS[Math.floor(Math.random() * COLORS.length)];
+  const shape   = isTrial ? null : pickShape();
+  const id      = S.boxCounter++;
 
   const el = document.createElement('div');
-  el.className = 'belt-box' + (isGold ? ' gold' : '');
+  el.className = 'belt-box' + (isGold ? ' gold' : '') + (isTrial ? ' trial' : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
-  const labelHtml = isGold ? '<span class="gold-spark">✨ GOLD ✨</span>' : color.name;
-  el.innerHTML = `<div class="box-emoji">${isGold ? '🎁' : '📦'}</div><div class="box-label">${labelHtml}</div>`;
-  el.addEventListener('click', () => openBox(id));
+  let labelHtml;
+  let emojiHtml;
+  if (isTrial)      { emojiHtml = '🎁✨'; labelHtml = '<span class="trial-spark">FREE TRY</span>'; }
+  else if (isGold)  { emojiHtml = '🎁';   labelHtml = '<span class="gold-spark">✨ GOLD ✨</span>'; }
+  else              { emojiHtml = '📦';   labelHtml = color.name; }
+  el.innerHTML = `<div class="box-emoji">${emojiHtml}</div><div class="box-label">${labelHtml}</div>`;
+  el.addEventListener('click', () => {
+    if (isTrial) takeTrialBox(id);
+    else openBox(id);
+  });
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial });
+  if (isTrial) S.trialUsed = true;
 }
 
 function openBox(id) {
@@ -1378,6 +1495,7 @@ function recalcPressure() {
   if (S.pressure >= 100) triggerGameOver();
   updatePanelGlow();
   updateVignette();
+  updateSaleBubble();
 }
 
 /* ===================================================
@@ -1532,6 +1650,7 @@ function updateTimer() {
    =================================================== */
 function expandGrid() {
   if (S.gameOver) return;
+  if (S.trialActive) { showToast('체험판이 끝난 뒤 사용해주세요!', 'warn'); return; }
 
   S.gridRows++;
   S.grid.push(Array(S.gridCols).fill(null));
@@ -1547,6 +1666,135 @@ function expandGrid() {
   const btn = document.getElementById('magic-shelf-btn');
   btn.style.transform = 'scale(.94)';
   setTimeout(() => btn.style.transform = '', 200);
+}
+
+/* ===================================================
+   🎁  TRIAL BOX (10초 진열장 2배 체험)
+   =================================================== */
+function takeTrialBox(id) {
+  const idx = S.boxes.findIndex(b => b.id === id);
+  if (idx === -1) return;
+  if (S.trialActive || S.gameOver) return;
+
+  const box = S.boxes.splice(idx, 1)[0];
+  box.el.classList.add('opening');
+  setTimeout(() => box.el.remove(), 380);
+  playSound('expand');
+
+  activateTrial();
+}
+
+function activateTrial() {
+  if (S.trialActive) return;
+  S.trialActive    = true;
+  S.trialAddedRows = S.gridRows;            // 두 배로 확장
+  for (let i = 0; i < S.trialAddedRows; i++) {
+    S.gridRows++;
+    S.grid.push(Array(S.gridCols).fill(null));
+  }
+  S.pressure = Math.max(0, S.pressure - 30);
+  recalcPressure();
+  renderGrid();
+  showToast('🎁 체험판! 10초간 진열장이 2배! 빨리 채워보세요', 'success');
+
+  // 카운트다운 배지
+  const badge = ensureTrialBadge();
+  badge.classList.add('show');
+  S.trialEndTs = performance.now() + CONFIG.TRIAL_DURATION_MS;
+}
+
+function endTrial() {
+  if (!S.trialActive) return;
+  S.trialActive = false;
+
+  // 추가됐던 행 안의 셀들을 잠깐 깜빡이며 제거
+  const addedFrom = S.gridRows - S.trialAddedRows;
+  for (let r = addedFrom; r < S.gridRows; r++) {
+    for (let c = 0; c < S.gridCols; c++) {
+      const el = getCell(r, c);
+      if (el) el.classList.add('clearing');
+    }
+  }
+
+  setTimeout(() => {
+    for (let i = 0; i < S.trialAddedRows; i++) {
+      S.grid.pop();
+      S.gridRows--;
+    }
+    S.trialAddedRows = 0;
+    renderGrid();
+    recalcPressure();
+  }, 420);
+
+  hideTrialBadge();
+  showToast('⏰ 체험판 종료! 마법의 압축 선반으로 영구 확장하세요', 'warn');
+
+  // 결제 버튼에 시선 끌기 펄스
+  const btn = document.getElementById('magic-shelf-btn');
+  if (btn) {
+    btn.classList.add('attention');
+    setTimeout(() => btn.classList.remove('attention'), 4500);
+  }
+}
+
+function ensureTrialBadge() {
+  let el = document.getElementById('trial-badge');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'trial-badge';
+    el.innerHTML = '🎁 <span id="trial-sec">10</span>s';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function hideTrialBadge() {
+  const el = document.getElementById('trial-badge');
+  if (el) el.classList.remove('show');
+}
+function updateTrialTick(ts) {
+  if (!S.trialActive) return;
+  const remain = Math.max(0, S.trialEndTs - ts);
+  const sec = Math.ceil(remain / 1000);
+  const s = document.getElementById('trial-sec');
+  if (s) s.textContent = sec;
+  if (remain <= 0) endTrial();
+}
+
+/* ===================================================
+   🔥  SALE BUBBLE (압박감 ≥ SALE_AT)
+   =================================================== */
+let _saleSwapTm = null;
+const SALE_LINES = [
+  '🔥 지금만 50% 할인!',
+  '⏰ 마지막 기회!',
+  '💸 -50% OFF',
+  '⚡ 곧 게임오버!'
+];
+let _saleIdx = 0;
+function updateSaleBubble() {
+  const wrap = document.getElementById('shelf-wrap');
+  if (!wrap) return;
+  let bubble = document.getElementById('sale-bubble');
+  const shouldShow = S.pressure >= CONFIG.SALE_AT && !S.gameOver;
+
+  if (shouldShow) {
+    if (!bubble) {
+      bubble = document.createElement('div');
+      bubble.id = 'sale-bubble';
+      bubble.className = 'sale-bubble';
+      bubble.textContent = SALE_LINES[0];
+      wrap.appendChild(bubble);
+      _saleIdx = 0;
+      if (_saleSwapTm) clearInterval(_saleSwapTm);
+      _saleSwapTm = setInterval(() => {
+        _saleIdx = (_saleIdx + 1) % SALE_LINES.length;
+        if (bubble && bubble.isConnected) bubble.textContent = SALE_LINES[_saleIdx];
+      }, 1400);
+    }
+  } else if (bubble) {
+    bubble.remove();
+    if (_saleSwapTm) { clearInterval(_saleSwapTm); _saleSwapTm = null; }
+  }
 }
 
 /* ===================================================
@@ -1568,6 +1816,13 @@ function restartGame() {
   document.getElementById('go-overlay').style.display = 'none';
   // Clear belt boxes
   document.getElementById('belt').innerHTML = '';
+  // Clear trial / sale UI
+  hideTrialBadge();
+  const sb = document.getElementById('sale-bubble');
+  if (sb) sb.remove();
+  if (_saleSwapTm) { clearInterval(_saleSwapTm); _saleSwapTm = null; }
+  const mbtn = document.getElementById('magic-shelf-btn');
+  if (mbtn) mbtn.classList.remove('attention');
   S = makeState();
   initGrid();
   renderGrid();
@@ -1644,8 +1899,12 @@ function loop(ts) {
   S.lastFrame    = ts;
   S.timeElapsed += dt;
 
-  // Spawn boxes
-  if (ts - S.lastSpawn > CONFIG.BOX_SPAWN_INTERVAL && S.boxes.length < CONFIG.MAX_BELT_BOXES) {
+  // Spawn boxes — interval은 시간이 지날수록 짧아짐 (가속 곡선)
+  const dynInterval = Math.max(
+    CONFIG.BOX_SPAWN_MIN,
+    CONFIG.BOX_SPAWN_INTERVAL - S.timeElapsed * CONFIG.BOX_SPAWN_RAMP
+  );
+  if (ts - S.lastSpawn > dynInterval && S.boxes.length < CONFIG.MAX_BELT_BOXES) {
     spawnBox();
     S.lastSpawn = ts;
   }
@@ -1661,6 +1920,7 @@ function loop(ts) {
 
   updateBelt(dt);
   recalcPressure();
+  updateTrialTick(ts);
   updateTimer();
 
   requestAnimationFrame(loop);
