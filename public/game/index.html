@@ -973,7 +973,11 @@ function onCellClick(r, c) {
     const el = getCell(gr, gc);
     if (!el) return;
     applyFilledStyle(el, color);
-    setTimeout(() => { el.classList.add('snap'); setTimeout(() => el.classList.remove('snap'), 320); }, i * 18);
+    setTimeout(() => {
+      el.classList.add('snap');
+      setTimeout(() => el.classList.remove('snap'), 320);
+      spawnPlaceParticles(el, color);
+    }, i * 18);
   });
 
   // ── score popup ──
