@@ -1091,8 +1091,9 @@ function openBox(id) {
   lid.className = 'ub-lid';
   const item = document.createElement('div');
   item.className = 'ub-item';
-  item.textContent = '🎁';
+  item.textContent = box.shape.emoji || '🎁';
   item.style.color = box.color.dk;
+  if (box.gold) item.classList.add('gold');
   box.el.appendChild(lid);
   box.el.appendChild(item);
 
@@ -1100,8 +1101,11 @@ function openBox(id) {
 
   setTimeout(() => {
     box.el.remove();
-    S.currentItem = { shape: box.shape, color: box.color };
+    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold };
     renderItemPreview();
+
+    // 도감 등록 (첫 발견 시 NEW 팝업)
+    registerDiscovery(box.shape, box.gold);
 
     // Check if item fits anywhere
     if (!fitsAnywhere(S.currentItem.shape)) {
