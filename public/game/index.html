@@ -1261,22 +1261,37 @@ function spawnBox() {
   const beltEl = document.getElementById('belt');
   const beltW  = beltEl.parentElement.offsetWidth || 560;
 
-  const isGold = Math.random() < CONFIG.GOLD_BOX_CHANCE;
-  const color  = isGold ? GOLD_COLOR : COLORS[Math.floor(Math.random() * COLORS.length)];
-  const shape  = pickShape();
-  const id     = S.boxCounter++;
+  // 체험판 상자: 게임당 1회만, 일정 압박감 이상에서만 등장
+  const isTrial = !S.trialUsed && !S.trialActive
+                 && S.timeElapsed > 25
+                 && S.pressure > 35
+                 && Math.random() < CONFIG.TRIAL_BOX_CHANCE;
+  const isGold  = !isTrial && Math.random() < CONFIG.GOLD_BOX_CHANCE;
+  const color   = isTrial ? { bg:'#E0D4FF', dk:'#7B5CCF', name:'TRIAL' }
+                : isGold  ? GOLD_COLOR
+                : COLORS[Math.floor(Math.random() * COLORS.length)];
+  const shape   = isTrial ? null : pickShape();
+  const id      = S.boxCounter++;
 
   const el = document.createElement('div');
-  el.className = 'belt-box' + (isGold ? ' gold' : '');
+  el.className = 'belt-box' + (isGold ? ' gold' : '') + (isTrial ? ' trial' : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
-  const labelHtml = isGold ? '<span class="gold-spark">✨ GOLD ✨</span>' : color.name;
-  el.innerHTML = `<div class="box-emoji">${isGold ? '🎁' : '📦'}</div><div class="box-label">${labelHtml}</div>`;
-  el.addEventListener('click', () => openBox(id));
+  let labelHtml;
+  let emojiHtml;
+  if (isTrial)      { emojiHtml = '🎁✨'; labelHtml = '<span class="trial-spark">FREE TRY</span>'; }
+  else if (isGold)  { emojiHtml = '🎁';   labelHtml = '<span class="gold-spark">✨ GOLD ✨</span>'; }
+  else              { emojiHtml = '📦';   labelHtml = color.name; }
+  el.innerHTML = `<div class="box-emoji">${emojiHtml}</div><div class="box-label">${labelHtml}</div>`;
+  el.addEventListener('click', () => {
+    if (isTrial) takeTrialBox(id);
+    else openBox(id);
+  });
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial });
+  if (isTrial) S.trialUsed = true;
 }
 
 function openBox(id) {
