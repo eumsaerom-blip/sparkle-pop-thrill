@@ -955,11 +955,13 @@ function onCellClick(r, c) {
 
   // ── place cells ──
   const placedCells = [];
+  let _firstStored = false;
   for (let dr = 0; dr < shape.cells.length; dr++)
     for (let dc = 0; dc < shape.cells[dr].length; dc++)
       if (shape.cells[dr][dc]) {
         const gr = r + dr, gc = c + dc;
-        S.grid[gr][gc] = color;
+        const isFirst = !_firstStored; _firstStored = true;
+        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null };
         placedCells.push({ gr, gc });
       }
 
