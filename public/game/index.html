@@ -1726,6 +1726,13 @@ function restartGame() {
   document.getElementById('go-overlay').style.display = 'none';
   // Clear belt boxes
   document.getElementById('belt').innerHTML = '';
+  // Clear trial / sale UI
+  hideTrialBadge();
+  const sb = document.getElementById('sale-bubble');
+  if (sb) sb.remove();
+  if (_saleSwapTm) { clearInterval(_saleSwapTm); _saleSwapTm = null; }
+  const mbtn = document.getElementById('magic-shelf-btn');
+  if (mbtn) mbtn.classList.remove('attention');
   S = makeState();
   initGrid();
   renderGrid();
