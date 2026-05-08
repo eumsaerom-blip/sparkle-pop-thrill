@@ -803,8 +803,9 @@ function renderGrid() {
       el.className = 'cell';
       el.dataset.r = r; el.dataset.c = c;
 
-      if (S.grid[r][c]) {
-        applyFilledStyle(el, S.grid[r][c]);
+      const cell = S.grid[r][c];
+      if (cell) {
+        applyFilledStyle(el, cell.color, { gold: cell.gold, emoji: cell.emoji });
       }
 
       el.addEventListener('mouseenter', () => onHover(r, c));
