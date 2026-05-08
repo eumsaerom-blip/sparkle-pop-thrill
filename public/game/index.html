@@ -1369,7 +1369,7 @@ function showSpaceWarn() {
   _swTm = setTimeout(() => el.classList.remove('show'), 1600);
 }
 
-function spawnScorePop(pts, r, c) {
+function spawnScorePop(pts, r, c, gold = false) {
   const gridEl = document.getElementById('grid');
   const rect   = gridEl.getBoundingClientRect();
   const cols   = S.gridCols;
@@ -1379,11 +1379,11 @@ function spawnScorePop(pts, r, c) {
   const y = rect.top  + r * rh;
 
   const el = document.createElement('div');
-  el.className = 'score-pop';
-  el.textContent = `+${pts}`;
+  el.className = 'score-pop' + (gold ? ' gold' : '');
+  el.textContent = (gold ? '✨ +' : '+') + pts + (gold ? ' ×5' : '');
   el.style.left  = x + 'px';
   el.style.top   = y + 'px';
-  el.style.color = '#3CC44A';
+  el.style.color = gold ? '#D9A21A' : '#3CC44A';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 950);
 }
