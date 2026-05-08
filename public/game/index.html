@@ -819,10 +819,16 @@ function renderGrid() {
   document.getElementById('grid-size-label').textContent = `${S.gridCols}×${S.gridRows}`;
 }
 
-function applyFilledStyle(el, color) {
+function applyFilledStyle(el, color, opts = {}) {
   el.classList.add('filled');
+  if (opts.gold) el.classList.add('gold-cell');
   el.style.background    = color.bg;
   el.style.borderColor   = color.dk;
+  if (opts.emoji) {
+    let em = el.querySelector('.cell-emoji');
+    if (!em) { em = document.createElement('span'); em.className = 'cell-emoji'; el.appendChild(em); }
+    em.textContent = opts.emoji;
+  }
 }
 
 function getCell(r, c) {
