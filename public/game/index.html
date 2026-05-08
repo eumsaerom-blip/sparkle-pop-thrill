@@ -1448,6 +1448,73 @@ function spawnComboBanner(combo) {
 }
 
 /* ===================================================
+   📖  COLLECTION (DEX)
+   =================================================== */
+const DEX_KEY = 'unboxing_dex_v1';
+let DEX = loadDex();
+
+function loadDex() {
+  try { return new Set(JSON.parse(localStorage.getItem(DEX_KEY) || '[]')); }
+  catch (_) { return new Set(); }
+}
+function saveDex() {
+  try { localStorage.setItem(DEX_KEY, JSON.stringify([...DEX])); } catch(_){}
+}
+function allShapes() {
+  return [...SHAPES.easy, ...SHAPES.medium, ...SHAPES.hard];
+}
+function updateDexCount() {
+  const el = document.getElementById('dex-count');
+  if (el) el.textContent = DEX.size;
+}
+function registerDiscovery(shape, isGold) {
+  const key = (isGold ? 'gold:' : '') + shape.key;
+  const baseKey = shape.key;
+  const isNewBase = !DEX.has(baseKey);
+  const isNewGold = isGold && !DEX.has('gold:' + baseKey);
+  if (isNewBase) DEX.add(baseKey);
+  if (isGold) DEX.add('gold:' + baseKey);
+  if (isNewBase || isNewGold) {
+    saveDex();
+    updateDexCount();
+    spawnDexNew(shape, isGold && !isNewBase);  // gold-only second find shows GOLD tag
+  }
+}
+function spawnDexNew(shape, goldOnly) {
+  const el = document.createElement('div');
+  el.className = 'dex-new';
+  const tag = goldOnly ? '✨ GOLD 발견!' : 'NEW! 컬렉션 등록';
+  el.innerHTML = `
+    <div class="dn-tag">${tag}</div>
+    <div class="dn-emoji">${shape.emoji || '🎁'}</div>
+    <div class="dn-title">${goldOnly ? '골드 버전!' : '새 아이템'}</div>
+    <div class="dn-name">${shape.label}</div>
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2700);
+}
+function openDex() {
+  const grid = document.getElementById('dex-grid');
+  const items = allShapes();
+  grid.innerHTML = '';
+  items.forEach(s => {
+    const found = DEX.has(s.key);
+    const gold  = DEX.has('gold:' + s.key);
+    const t = document.createElement('div');
+    t.className = 'dex-tile' + (found ? '' : ' locked') + (gold ? ' gold-cell' : '');
+    t.innerHTML = `<span class="dt-emoji">${s.emoji || '🎁'}</span>` +
+                  (found ? `<span class="dt-name">${s.label}${gold ? ' ✨' : ''}</span>` : '');
+    grid.appendChild(t);
+  });
+  document.getElementById('dex-sub').textContent =
+    `${items.filter(s => DEX.has(s.key)).length} / ${items.length} 발견`;
+  document.getElementById('dex-modal').classList.add('show');
+}
+function closeDex() {
+  document.getElementById('dex-modal').classList.remove('show');
+}
+
+/* ===================================================
    🏆  SCORE & TIMER
    =================================================== */
 function updateScoreUI() {
