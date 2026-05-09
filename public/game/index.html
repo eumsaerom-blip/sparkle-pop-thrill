@@ -1378,8 +1378,17 @@ function spawnBox() {
   const shape   = isTrial ? null : pickShape();
   const id      = S.boxCounter++;
 
+  // 희귀도 결정 (트라이얼/골드는 별도 처리)
+  let rarity = 'common';
+  if (!isTrial) {
+    rarity = isGold ? 'legendary' : pickRarity();
+  }
+
   const el = document.createElement('div');
-  el.className = 'belt-box' + (isGold ? ' gold' : '') + (isTrial ? ' trial' : '');
+  el.className = 'belt-box'
+    + (isGold ? ' gold' : '')
+    + (isTrial ? ' trial' : '')
+    + (!isTrial && !isGold ? ` rarity-${rarity}` : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
@@ -1395,7 +1404,7 @@ function spawnBox() {
   });
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial, rarity });
   if (isTrial) S.trialUsed = true;
 }
 
