@@ -1299,7 +1299,8 @@ function onCellClick(r, c) {
   });
 
   // ── score popup ──
-  spawnScorePop(pts, r, c, gold);
+  const rareOrBetter = rarity && rarity !== 'common';
+  spawnScorePop(pts, r, c, gold || rareOrBetter);
 
   S.currentItem = null;
   renderItemPreview();
