@@ -1487,6 +1487,10 @@ function checkLineClear() {
     renderGrid();
     updateScoreUI();
     showToast(`${full.length}줄 클리어! +${Math.round(bonus)}점 🎉`, 'success');
+
+    // 그리드가 완전히 비었으면 피버 발동
+    const allEmpty = S.grid.every(row => row.every(v => v === null));
+    if (allEmpty && !S.fever) triggerFever();
   }, 480);
 }
 
