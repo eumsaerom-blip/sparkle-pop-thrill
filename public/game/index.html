@@ -2107,6 +2107,13 @@ function loop(ts) {
   S.lastFrame    = ts;
   S.timeElapsed += dt;
 
+  // 피버 타이머
+  if (S.fever) {
+    S.feverTimeLeft -= dt;
+    updateFeverBar();
+    if (S.feverTimeLeft <= 0) endFever();
+  }
+
   // Spawn boxes — interval은 시간이 지날수록 짧아짐 (가속 곡선)
   const dynInterval = Math.max(
     CONFIG.BOX_SPAWN_MIN,
