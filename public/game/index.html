@@ -1990,6 +1990,11 @@ function restartGame() {
   if (_saleSwapTm) { clearInterval(_saleSwapTm); _saleSwapTm = null; }
   const mbtn = document.getElementById('magic-shelf-btn');
   if (mbtn) mbtn.classList.remove('attention');
+  // 피버 초기화
+  document.body.classList.remove('fever-mode');
+  const fbw = document.getElementById('fever-bar-wrap');
+  if (fbw) fbw.style.display = 'none';
+  document.querySelectorAll('.fever-banner').forEach(b => b.remove());
   S = makeState();
   initGrid();
   renderGrid();
