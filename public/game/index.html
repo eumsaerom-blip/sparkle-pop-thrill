@@ -2059,6 +2059,47 @@ function spawnCombo(n) {
 /* ===================================================
    🔄  MAIN GAME LOOP
    =================================================== */
+/* ===================================================
+   🔥  FEVER TIME
+   =================================================== */
+function triggerFever() {
+  S.fever = true;
+  S.feverTimeLeft = 10;
+  document.body.classList.add('fever-mode');
+
+  const wrap = document.getElementById('fever-bar-wrap');
+  if (wrap) wrap.style.display = 'flex';
+  updateFeverBar();
+
+  // 배너
+  const old = document.querySelector('.fever-banner');
+  if (old) old.remove();
+  const banner = document.createElement('div');
+  banner.className = 'fever-banner';
+  banner.textContent = 'FEVER! 🔥';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 3000);
+
+  try { playSound('clear'); } catch(e) {}
+}
+
+function endFever() {
+  S.fever = false;
+  S.feverTimeLeft = 0;
+  document.body.classList.remove('fever-mode');
+  const wrap = document.getElementById('fever-bar-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function updateFeverBar() {
+  const fill = document.getElementById('fever-bar-fill');
+  const time = document.getElementById('fever-bar-time');
+  if (!fill || !time) return;
+  const ratio = Math.max(0, Math.min(1, S.feverTimeLeft / 10));
+  fill.style.width = (ratio * 100) + '%';
+  time.textContent = Math.max(0, Math.ceil(S.feverTimeLeft)) + 's';
+}
+
 function loop(ts) {
   if (!S.running) return;
 
