@@ -1400,6 +1400,10 @@ function onCellClick(r, c) {
   const cellCount = placedCells.length;
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
   if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
+  if (S.fever) pts *= 3;
+
+  // rare 이상 획득 카운트
+  if (rarity && rarity !== 'common') S.rareCount++;
 
   if (now - S.lastPlaceTs < CONFIG.COMBO_WINDOW_MS) {
     S.combo++;
