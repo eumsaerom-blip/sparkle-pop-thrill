@@ -1436,7 +1436,7 @@ function openBox(id) {
 
   setTimeout(() => {
     box.el.remove();
-    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold };
+    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold, rarity: box.rarity || 'common' };
     renderItemPreview();
 
     // 도감 등록 (첫 발견 시 NEW 팝업)
