@@ -355,7 +355,79 @@ body {
   to   { transform: rotate(360deg); }
 }
 
-/* ===== THEME: CELL EMOJI + GOLD ===== */
+/* ===== FEVER TIME ===== */
+.fever-bar-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; margin: 6px 0 10px;
+  background: rgba(20,15,30,.06);
+  border-radius: 12px;
+}
+.fever-bar-label { font-weight: 900; font-size: 13px; letter-spacing: .5px; color: #E8459C; white-space: nowrap; }
+.fever-bar-track {
+  flex: 1; height: 14px; border-radius: 8px;
+  background: rgba(0,0,0,.12); overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.18);
+}
+.fever-bar-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, #FF3D7F 0%, #FF9A3D 18%, #FFE34D 36%, #4DFF7A 54%, #4DC8FF 72%, #A85CFF 90%, #FF3DCB 100%);
+  background-size: 200% 100%;
+  animation: feverBarShift 1.2s linear infinite;
+  transition: width .15s linear;
+  box-shadow: 0 0 12px rgba(255,80,180,.55);
+}
+@keyframes feverBarShift {
+  from { background-position: 0 0; }
+  to   { background-position: 200% 0; }
+}
+.fever-bar-time { font-weight: 900; font-size: 13px; color: #5a2a8a; min-width: 30px; text-align: right; }
+
+body::after {
+  content: ''; position: fixed; inset: 0;
+  pointer-events: none; z-index: 9997;
+  opacity: 0;
+  background: linear-gradient(120deg,
+    rgba(255,61,127,.18) 0%,
+    rgba(255,154,61,.18) 16%,
+    rgba(255,227,77,.18) 32%,
+    rgba(77,255,122,.18) 48%,
+    rgba(77,200,255,.18) 64%,
+    rgba(168,92,255,.18) 80%,
+    rgba(255,61,203,.18) 100%);
+  background-size: 300% 100%;
+  mix-blend-mode: overlay;
+  transition: opacity .3s;
+}
+body.fever-mode::after {
+  opacity: 1;
+  animation: rainbowWave 1.6s linear infinite;
+}
+@keyframes rainbowWave {
+  0%   { background-position: 0% 0; filter: hue-rotate(0deg); }
+  100% { background-position: 300% 0; filter: hue-rotate(360deg); }
+}
+
+.fever-banner {
+  position: fixed; left: 50%; top: 38%;
+  transform: translate(-50%, -50%) scale(.4);
+  font-family: 'Nunito', sans-serif;
+  font-size: 96px; font-weight: 900;
+  letter-spacing: -2px;
+  pointer-events: none; z-index: 10001;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #FFE34D 0%, #FF6B3D 50%, #E8459C 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 0 36px rgba(255,120,180,.8);
+  filter: drop-shadow(0 6px 0 rgba(120,20,80,.35));
+  animation: feverBannerIn 3s cubic-bezier(.2,1.6,.4,1) forwards;
+}
+@keyframes feverBannerIn {
+  0%   { transform: translate(-50%,-50%) scale(.3) rotate(-8deg); opacity: 0; }
+  12%  { transform: translate(-50%,-50%) scale(1.3) rotate(4deg); opacity: 1; }
+  22%  { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  78%  { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1.4) rotate(0); opacity: 0; }
+}
 .cell { position: relative; }
 .cell-emoji {
   position: absolute; inset: 0;
@@ -867,6 +939,15 @@ body {
   <span class="pressure-pct" id="pressure-pct">0%</span>
 </div>
 
+<!-- ========= FEVER BAR ========= -->
+<div class="fever-bar-wrap" id="fever-bar-wrap" style="display:none;">
+  <span class="fever-bar-label">🔥 FEVER</span>
+  <div class="fever-bar-track">
+    <div class="fever-bar-fill" id="fever-bar-fill"></div>
+  </div>
+  <span class="fever-bar-time" id="fever-bar-time">10s</span>
+</div>
+
 <!-- ========= BELT SECTION ========= -->
 <section class="belt-section">
   <div class="belt-hd">
@@ -1081,6 +1162,11 @@ function makeState() {
     trialAddedRows:0,
     trialEndTs:    0,
     trialUsed:     false,   // 게임당 1회만 등장하도록 제한
+
+    // 피버 타임
+    fever:         false,
+    feverTimeLeft: 0,
+    rareCount:     0,       // rare 이상 획득 횟수 (공유카드용)
   };
 }
 
@@ -1314,6 +1400,10 @@ function onCellClick(r, c) {
   const cellCount = placedCells.length;
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
   if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
+  if (S.fever) pts *= 3;
+
+  // rare 이상 획득 카운트
+  if (rarity && rarity !== 'common') S.rareCount++;
 
   if (now - S.lastPlaceTs < CONFIG.COMBO_WINDOW_MS) {
     S.combo++;
@@ -1397,6 +1487,10 @@ function checkLineClear() {
     renderGrid();
     updateScoreUI();
     showToast(`${full.length}줄 클리어! +${Math.round(bonus)}점 🎉`, 'success');
+
+    // 그리드가 완전히 비었으면 피버 발동
+    const allEmpty = S.grid.every(row => row.every(v => v === null));
+    if (allEmpty && !S.fever) triggerFever();
   }, 480);
 }
 
@@ -1896,6 +1990,11 @@ function restartGame() {
   if (_saleSwapTm) { clearInterval(_saleSwapTm); _saleSwapTm = null; }
   const mbtn = document.getElementById('magic-shelf-btn');
   if (mbtn) mbtn.classList.remove('attention');
+  // 피버 초기화
+  document.body.classList.remove('fever-mode');
+  const fbw = document.getElementById('fever-bar-wrap');
+  if (fbw) fbw.style.display = 'none';
+  document.querySelectorAll('.fever-banner').forEach(b => b.remove());
   S = makeState();
   initGrid();
   renderGrid();
@@ -1965,12 +2064,60 @@ function spawnCombo(n) {
 /* ===================================================
    🔄  MAIN GAME LOOP
    =================================================== */
+/* ===================================================
+   🔥  FEVER TIME
+   =================================================== */
+function triggerFever() {
+  S.fever = true;
+  S.feverTimeLeft = 10;
+  document.body.classList.add('fever-mode');
+
+  const wrap = document.getElementById('fever-bar-wrap');
+  if (wrap) wrap.style.display = 'flex';
+  updateFeverBar();
+
+  // 배너
+  const old = document.querySelector('.fever-banner');
+  if (old) old.remove();
+  const banner = document.createElement('div');
+  banner.className = 'fever-banner';
+  banner.textContent = 'FEVER! 🔥';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 3000);
+
+  try { playSound('clear'); } catch(e) {}
+}
+
+function endFever() {
+  S.fever = false;
+  S.feverTimeLeft = 0;
+  document.body.classList.remove('fever-mode');
+  const wrap = document.getElementById('fever-bar-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function updateFeverBar() {
+  const fill = document.getElementById('fever-bar-fill');
+  const time = document.getElementById('fever-bar-time');
+  if (!fill || !time) return;
+  const ratio = Math.max(0, Math.min(1, S.feverTimeLeft / 10));
+  fill.style.width = (ratio * 100) + '%';
+  time.textContent = Math.max(0, Math.ceil(S.feverTimeLeft)) + 's';
+}
+
 function loop(ts) {
   if (!S.running) return;
 
   const dt = Math.min((ts - S.lastFrame) / 1000, .1);
   S.lastFrame    = ts;
   S.timeElapsed += dt;
+
+  // 피버 타이머
+  if (S.fever) {
+    S.feverTimeLeft -= dt;
+    updateFeverBar();
+    if (S.feverTimeLeft <= 0) endFever();
+  }
 
   // Spawn boxes — interval은 시간이 지날수록 짧아짐 (가속 곡선)
   const dynInterval = Math.max(
