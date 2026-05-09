@@ -308,6 +308,53 @@ body {
 .gold-spark { font-weight: 900; color: #8a5a00; letter-spacing: .8px; }
 .ub-item.gold { filter: drop-shadow(0 0 12px rgba(255,200,40,.9)) drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
 
+/* ===== THEME: RARITY BORDERS ===== */
+.belt-box.rarity-rare {
+  border: 3px solid #4A9FFF !important;
+  box-shadow: 0 0 14px rgba(74,159,255,.65), 0 4px 12px rgba(20,80,180,.35);
+}
+.belt-box.rarity-epic {
+  border: 3px solid #A855F7 !important;
+  box-shadow: 0 0 16px rgba(168,85,247,.7), 0 4px 12px rgba(90,30,160,.4);
+  position: relative;
+  overflow: hidden;
+}
+.belt-box.rarity-epic::before {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 12px; pointer-events: none;
+  border: 3px solid transparent;
+  background: linear-gradient(120deg, transparent 30%, rgba(216,180,254,.85) 50%, transparent 70%) border-box;
+  background-size: 220% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: epicShimmer 1.6s linear infinite;
+}
+@keyframes epicShimmer {
+  from { background-position: 220% 0; }
+  to   { background-position: -120% 0; }
+}
+.belt-box.rarity-legendary {
+  border: 3px solid #F59E0B !important;
+  box-shadow: 0 0 18px rgba(245,158,11,.85), 0 4px 14px rgba(180,110,0,.45);
+  position: relative;
+}
+.belt-box.rarity-legendary::before {
+  content: ''; position: absolute; inset: -8px;
+  border-radius: 16px; pointer-events: none; z-index: -1;
+  background: conic-gradient(from 0deg,
+    rgba(245,158,11,0) 0%,
+    rgba(255,210,80,.95) 25%,
+    rgba(245,158,11,0) 50%,
+    rgba(255,180,40,.9) 75%,
+    rgba(245,158,11,0) 100%);
+  filter: blur(6px);
+  animation: legendaryGlow 2.2s linear infinite;
+}
+@keyframes legendaryGlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ===== THEME: CELL EMOJI + GOLD ===== */
 .cell { position: relative; }
 .cell-emoji {
