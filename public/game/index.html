@@ -308,6 +308,53 @@ body {
 .gold-spark { font-weight: 900; color: #8a5a00; letter-spacing: .8px; }
 .ub-item.gold { filter: drop-shadow(0 0 12px rgba(255,200,40,.9)) drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
 
+/* ===== THEME: RARITY BORDERS ===== */
+.belt-box.rarity-rare {
+  border: 3px solid #4A9FFF !important;
+  box-shadow: 0 0 14px rgba(74,159,255,.65), 0 4px 12px rgba(20,80,180,.35);
+}
+.belt-box.rarity-epic {
+  border: 3px solid #A855F7 !important;
+  box-shadow: 0 0 16px rgba(168,85,247,.7), 0 4px 12px rgba(90,30,160,.4);
+  position: relative;
+  overflow: hidden;
+}
+.belt-box.rarity-epic::before {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 12px; pointer-events: none;
+  border: 3px solid transparent;
+  background: linear-gradient(120deg, transparent 30%, rgba(216,180,254,.85) 50%, transparent 70%) border-box;
+  background-size: 220% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: epicShimmer 1.6s linear infinite;
+}
+@keyframes epicShimmer {
+  from { background-position: 220% 0; }
+  to   { background-position: -120% 0; }
+}
+.belt-box.rarity-legendary {
+  border: 3px solid #F59E0B !important;
+  box-shadow: 0 0 18px rgba(245,158,11,.85), 0 4px 14px rgba(180,110,0,.45);
+  position: relative;
+}
+.belt-box.rarity-legendary::before {
+  content: ''; position: absolute; inset: -8px;
+  border-radius: 16px; pointer-events: none; z-index: -1;
+  background: conic-gradient(from 0deg,
+    rgba(245,158,11,0) 0%,
+    rgba(255,210,80,.95) 25%,
+    rgba(245,158,11,0) 50%,
+    rgba(255,180,40,.9) 75%,
+    rgba(245,158,11,0) 100%);
+  filter: blur(6px);
+  animation: legendaryGlow 2.2s linear infinite;
+}
+@keyframes legendaryGlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ===== THEME: CELL EMOJI + GOLD ===== */
 .cell { position: relative; }
 .cell-emoji {
@@ -946,25 +993,41 @@ const CONFIG = {
 /* ===  도형 정의  === */
 const SHAPES = {
   easy: [
-    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2 },
-    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3 },
-    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3 },
+    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2, rarity:'common' },
+    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3, rarity:'common' },
+    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3, rarity:'common' },
   ],
   medium: [
-    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5 },
-    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5 },
-    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7 },
-    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6 },
-    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6 },
+    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5, rarity:'common' },
+    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5, rarity:'common' },
+    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7, rarity:'rare' },
+    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6, rarity:'common' },
+    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6, rarity:'rare' },
   ],
   hard: [
-    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10 },
-    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10 },
-    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11 },
-    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12 },
-    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12 },
+    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10, rarity:'rare' },
+    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10, rarity:'epic' },
+    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11, rarity:'epic' },
+    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12, rarity:'legendary' },
+    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12, rarity:'epic' },
   ],
 };
+
+/* === 희귀도 확률 (S.fever 시 상승) === */
+function pickRarity() {
+  const r = Math.random();
+  const fever = (typeof S !== 'undefined') && S && S.fever === true;
+  if (fever) {
+    if (r < 0.20) return 'common';
+    if (r < 0.65) return 'rare';
+    if (r < 0.93) return 'epic';
+    return 'legendary';
+  }
+  if (r < 0.60) return 'common';
+  if (r < 0.88) return 'rare';
+  if (r < 0.98) return 'epic';
+  return 'legendary';
+}
 
 /* === 골드 상자 (희귀) === */
 const GOLD_COLOR = { bg:'#FFE9A8', dk:'#D9A21A', name:'GOLD', gold:true };
@@ -1225,7 +1288,7 @@ function onLeave() {
 function onCellClick(r, c) {
   if (!S.currentItem || S.gameOver) return;
 
-  const { shape, color, gold } = S.currentItem;
+  const { shape, color, gold, rarity } = S.currentItem;
 
   if (!canPlace(shape, r, c)) {
     playSound('error');
@@ -1283,7 +1346,8 @@ function onCellClick(r, c) {
   });
 
   // ── score popup ──
-  spawnScorePop(pts, r, c, gold);
+  const rareOrBetter = rarity && rarity !== 'common';
+  spawnScorePop(pts, r, c, gold || rareOrBetter);
 
   S.currentItem = null;
   renderItemPreview();
@@ -1362,8 +1426,17 @@ function spawnBox() {
   const shape   = isTrial ? null : pickShape();
   const id      = S.boxCounter++;
 
+  // 희귀도 결정 (트라이얼/골드는 별도 처리)
+  let rarity = 'common';
+  if (!isTrial) {
+    rarity = isGold ? 'legendary' : pickRarity();
+  }
+
   const el = document.createElement('div');
-  el.className = 'belt-box' + (isGold ? ' gold' : '') + (isTrial ? ' trial' : '');
+  el.className = 'belt-box'
+    + (isGold ? ' gold' : '')
+    + (isTrial ? ' trial' : '')
+    + (!isTrial && !isGold ? ` rarity-${rarity}` : '');
   el.id = `box-${id}`;
   el.style.background = color.bg;
   el.style.left = beltW + 'px';
@@ -1379,7 +1452,7 @@ function spawnBox() {
   });
 
   beltEl.appendChild(el);
-  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial });
+  S.boxes.push({ id, x: beltW, color, shape, el, gold: isGold, trial: isTrial, rarity });
   if (isTrial) S.trialUsed = true;
 }
 
@@ -1411,7 +1484,7 @@ function openBox(id) {
 
   setTimeout(() => {
     box.el.remove();
-    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold };
+    S.currentItem = { shape: box.shape, color: box.color, gold: !!box.gold, rarity: box.rarity || 'common' };
     renderItemPreview();
 
     // 도감 등록 (첫 발견 시 NEW 팝업)
