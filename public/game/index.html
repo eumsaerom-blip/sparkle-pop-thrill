@@ -1241,7 +1241,7 @@ function onLeave() {
 function onCellClick(r, c) {
   if (!S.currentItem || S.gameOver) return;
 
-  const { shape, color, gold } = S.currentItem;
+  const { shape, color, gold, rarity } = S.currentItem;
 
   if (!canPlace(shape, r, c)) {
     playSound('error');
