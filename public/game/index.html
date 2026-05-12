@@ -2100,6 +2100,7 @@ function triggerGameOver() {
   document.getElementById('final-score').textContent   = S.score.toLocaleString();
   const m = Math.floor(S.timeElapsed/60), s = Math.floor(S.timeElapsed%60);
   document.getElementById('final-time').textContent    = `${m}:${String(s).padStart(2,'0')}`;
+  updateItemButtons();
 }
 
 function restartGame() {
