@@ -1012,6 +1012,13 @@ body.redzone-shake { animation: screenShake .25s linear infinite; }
   </div>
 </header>
 
+<!-- ========= ITEM BAR (소모성) ========= -->
+<div class="item-bar">
+  <button id="btn-pause"  onclick="useItem('pause')">⏸️ 정지 <span class="cnt" id="cnt-pause">1</span></button>
+  <button id="btn-reroll" onclick="useItem('reroll')">🔄 리롤 <span class="cnt" id="cnt-reroll">1</span></button>
+  <button id="btn-bomb"   onclick="useItem('bomb')">💣 폭파 <span class="cnt" id="cnt-bomb">1</span></button>
+</div>
+
 <!-- ========= PRESSURE BAR ========= -->
 <div class="pressure-wrap">
   <span class="pressure-label">😰 압박감</span>
