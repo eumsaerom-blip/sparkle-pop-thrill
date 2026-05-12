@@ -1505,6 +1505,10 @@ function onCellClick(r, c) {
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
   if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
   if (S.fever) pts *= 3;
+  // STEP 7: 세트 보너스 활성 + 카테고리 일치 시 점수 2배
+  if (S.setBonusActive && shape.category && S.setBonusCategory === shape.category) {
+    pts *= 2;
+  }
 
   // rare 이상 획득 카운트
   if (rarity && rarity !== 'common') S.rareCount++;
