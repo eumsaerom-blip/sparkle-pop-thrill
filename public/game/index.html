@@ -930,6 +930,53 @@ body.redzone-shake { animation: screenShake .25s linear infinite; }
 }
 #last-chance.show { display: block; }
 
+/* ===================================================
+   ITEM BAR (소모성 아이템 버튼)
+   =================================================== */
+.item-bar {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  margin: 4px 0 2px;
+  flex-wrap: wrap;
+}
+.item-bar button {
+  background: #FFF8F0;
+  border: 1px solid #E6DDD4;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-weight: 800;
+  font-family: inherit;
+  font-size: 14px;
+  color: #4A3A2C;
+  cursor: pointer;
+  transition: background .15s ease, transform .1s ease, opacity .2s ease;
+  display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+}
+.item-bar button:hover:not(:disabled) { background: #FFF0E0; transform: translateY(-1px); }
+.item-bar button:active:not(:disabled) { transform: translateY(0); }
+.item-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+.item-bar button .cnt {
+  background: #4A3A2C; color: #fff; border-radius: 999px;
+  font-size: 11px; padding: 1px 7px; font-weight: 900; min-width: 18px;
+  text-align: center;
+}
+.item-bar button.counting { background: #FFE0B0; }
+
+/* SHARE BUTTON */
+.share-btn {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #FF9F7F, #FF6B6B);
+  color: #fff; font-weight: 900; font-family: inherit;
+  border: none; border-radius: 14px;
+  padding: 12px 28px; font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255,107,107,.4);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.share-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255,107,107,.5); }
+.share-btn:active { transform: translateY(0); }
+
+
 
 /* ===================================================
    RESPONSIVE
