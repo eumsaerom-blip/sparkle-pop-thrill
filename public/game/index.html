@@ -2136,6 +2136,40 @@ function updateSaleBubble() {
 /* ===================================================
    🎒  소모성 아이템 (정지 / 리롤 / 폭파)
    =================================================== */
+/* ===================================================
+   ✨ 세트 보너스 (STEP 7)
+   =================================================== */
+const CATEGORY_LABELS = {
+  food: '푸드', toy: '토이', beauty: '뷰티', nature: '네이처', home: '홈',
+};
+function setBonus(category) {
+  S.setBonusActive   = true;
+  S.setBonusCategory = category;
+  S.setBonusEndTs    = performance.now() + 30000;
+
+  showToast(`✨ ${CATEGORY_LABELS[category] || category} 세트 완성! 30초간 점수 2배`, 'good');
+
+  // 기존 같은 카테고리 셀에 set-gold 클래스 부여
+  for (let r = 0; r < S.gridRows; r++) {
+    for (let c = 0; c < S.gridCols; c++) {
+      const cell = S.grid[r] && S.grid[r][c];
+      if (cell && cell.category === category) {
+        const el = getCell(r, c);
+        if (el) el.classList.add('set-gold');
+      }
+    }
+  }
+
+  if (S.setBonusTimer) clearTimeout(S.setBonusTimer);
+  S.setBonusTimer = setTimeout(() => endSetBonus(), 30000);
+}
+function endSetBonus() {
+  S.setBonusActive   = false;
+  S.setBonusCategory = null;
+  if (S.setBonusTimer) { clearTimeout(S.setBonusTimer); S.setBonusTimer = null; }
+  document.querySelectorAll('.cell.set-gold').forEach(el => el.classList.remove('set-gold'));
+}
+
 function updateItemButtons() {
   const map = { pause: 'btn-pause', reroll: 'btn-reroll', bomb: 'btn-bomb' };
   Object.keys(map).forEach(k => {
