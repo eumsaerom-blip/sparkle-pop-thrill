@@ -1698,6 +1698,34 @@ function recalcPressure() {
   updatePanelGlow();
   updateVignette();
   updateSaleBubble();
+  updateRedzone();
+}
+
+function updateRedzone() {
+  const body = document.body;
+  const lc = document.getElementById('last-chance');
+  // Disable redzone visuals during fever
+  if (S.fever || S.gameOver) {
+    body.style.backgroundColor = '';
+    body.classList.remove('redzone-pulse', 'redzone-shake');
+    if (lc) lc.classList.remove('show');
+    return;
+  }
+  const p = S.pressure;
+  if (p < 70) {
+    body.style.backgroundColor = '';
+    body.classList.remove('redzone-pulse', 'redzone-shake');
+  } else {
+    body.style.backgroundColor = '#FFF0E0';
+    if (p >= 85) body.classList.add('redzone-pulse');
+    else         body.classList.remove('redzone-pulse');
+    if (p >= 95) body.classList.add('redzone-shake');
+    else         body.classList.remove('redzone-shake');
+  }
+  if (lc) {
+    if (p >= 95 && !S.fever) lc.classList.add('show');
+    else                     lc.classList.remove('show');
+  }
 }
 
 /* ===================================================
