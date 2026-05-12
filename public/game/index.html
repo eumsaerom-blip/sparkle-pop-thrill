@@ -2088,6 +2088,165 @@ function updateSaleBubble() {
 }
 
 /* ===================================================
+   🎒  소모성 아이템 (정지 / 리롤 / 폭파)
+   =================================================== */
+function updateItemButtons() {
+  const map = { pause: 'btn-pause', reroll: 'btn-reroll', bomb: 'btn-bomb' };
+  Object.keys(map).forEach(k => {
+    const btn = document.getElementById(map[k]);
+    const cnt = document.getElementById('cnt-' + k);
+    if (!btn || !cnt) return;
+    const n = (S.items && S.items[k] != null) ? S.items[k] : 0;
+    cnt.textContent = n;
+    btn.disabled = (n <= 0) || S.gameOver;
+  });
+}
+
+function useItem(kind) {
+  if (!S.items || S.gameOver) return;
+  if (S.items[kind] <= 0) return;
+
+  if (kind === 'pause') {
+    if (!S.running) return;
+    S.items.pause--;
+    updateItemButtons();
+    S.running = false;
+    const btn = document.getElementById('btn-pause');
+    btn.classList.add('counting');
+    let left = 5;
+    const orig = btn.innerHTML;
+    btn.innerHTML = `⏸️ ${left}`;
+    const tm = setInterval(() => {
+      left--;
+      if (left > 0) {
+        btn.innerHTML = `⏸️ ${left}`;
+      } else {
+        clearInterval(tm);
+        btn.classList.remove('counting');
+        btn.innerHTML = orig;
+        updateItemButtons();
+        if (!S.gameOver) {
+          S.running = true;
+          S.lastFrame = performance.now();
+          S.lastSpawn = performance.now();
+          requestAnimationFrame(ts => { S.lastFrame = ts; loop(ts); });
+        }
+      }
+    }, 1000);
+  }
+
+  else if (kind === 'reroll') {
+    if (!S.boxes.length) { showToast('🔄 벨트가 비었어요', 'warn'); return; }
+    // 벨트 맨 앞 = x가 가장 큰 박스 (트라이얼/골드 제외)
+    const candidates = S.boxes.filter(b => !b.trial && !b.gold);
+    if (!candidates.length) { showToast('🔄 리롤할 상자가 없어요', 'warn'); return; }
+    const front = candidates.reduce((a, b) => (a.x > b.x ? a : b));
+    S.items.reroll--;
+    updateItemButtons();
+    const newShape = pickShape();
+    const newRarity = pickRarity();
+    const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    front.shape = newShape;
+    front.rarity = newRarity;
+    front.color = newColor;
+    front.el.style.background = newColor.bg;
+    front.el.className = 'belt-box rarity-' + newRarity;
+    front.el.innerHTML = `<div class="box-emoji">📦</div><div class="box-label">${newColor.name}</div>`;
+    front.el.classList.add('reroll-flash');
+    setTimeout(() => front.el.classList.remove('reroll-flash'), 400);
+    playSound('click');
+  }
+
+  else if (kind === 'bomb') {
+    // 가장 채워진 행 찾기
+    let bestRow = -1, bestCount = 0;
+    for (let r = 0; r < S.gridRows; r++) {
+      const c = S.grid[r].filter(Boolean).length;
+      if (c > bestCount) { bestCount = c; bestRow = r; }
+    }
+    if (bestRow < 0 || bestCount === 0) {
+      showToast('💣 폭파할 행이 없어요', 'warn');
+      return;
+    }
+    S.items.bomb--;
+    updateItemButtons();
+    // 행 제거 + 위에서 한 칸씩 내리기
+    for (let r = bestRow; r > 0; r--) {
+      S.grid[r] = S.grid[r - 1].slice();
+    }
+    S.grid[0] = Array(S.gridCols).fill(null);
+    renderGrid();
+    recalcPressure();
+    playSound('clear');
+    showToast('💣 한 줄 폭파!', 'good');
+  }
+}
+
+/* ===================================================
+   📸  결과 공유 카드 (Canvas)
+   =================================================== */
+function shareResult() {
+  const W = 600, H = 400;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+
+  // a) 배경 그라디언트
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#FFF8F0');
+  grad.addColorStop(1, '#FFE8D0');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // b) 타이틀
+  ctx.fillStyle = '#4A3A2C';
+  ctx.font = '900 30px Nunito, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('📦 언박싱 마스터', 36, 60);
+
+  // c) 구분선
+  ctx.strokeStyle = 'rgba(74,58,44,.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(36, 84); ctx.lineTo(W - 36, 84); ctx.stroke();
+
+  // d) 통계
+  const m = Math.floor(S.timeElapsed / 60);
+  const s = Math.floor(S.timeElapsed % 60);
+  const stats = [
+    `🏆  최종 점수:  ${S.score.toLocaleString()}`,
+    `⏱️  플레이 타임:  ${m}:${String(s).padStart(2,'0')}`,
+    `🌟  레어 이상 획득:  ${S.rareCount}개`,
+    `📦  총 언박싱:  ${S.totalUnboxed}개`,
+  ];
+  ctx.fillStyle = '#3A2E22';
+  ctx.font = '800 22px Nunito, sans-serif';
+  stats.forEach((t, i) => ctx.fillText(t, 44, 130 + i * 42));
+
+  // e) 해시태그
+  ctx.fillStyle = '#9A8470';
+  ctx.font = '700 14px Nunito, sans-serif';
+  ctx.fillText('#언박싱마스터  #하울  #ASMR게임', 36, H - 36);
+
+  // f) 워터마크
+  ctx.fillStyle = 'rgba(74,58,44,.45)';
+  ctx.font = '900 12px Nunito, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('UNBOXING MASTER', W - 36, H - 20);
+
+  cv.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '언박싱마스터_결과.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+}
+
+/* ===================================================
    💀  GAME OVER
    =================================================== */
 function triggerGameOver() {
