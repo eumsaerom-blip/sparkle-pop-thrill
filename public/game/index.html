@@ -1342,6 +1342,9 @@ function renderGrid() {
       const cell = S.grid[r][c];
       if (cell) {
         applyFilledStyle(el, cell.color, { gold: cell.gold, emoji: cell.emoji });
+        if (S.setBonusActive && cell.category === S.setBonusCategory) {
+          el.classList.add('set-gold');
+        }
       }
 
       el.addEventListener('mouseenter', () => onHover(r, c));
