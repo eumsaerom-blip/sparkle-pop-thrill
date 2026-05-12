@@ -1495,7 +1495,7 @@ function onCellClick(r, c) {
       if (shape.cells[dr][dc]) {
         const gr = r + dr, gc = c + dc;
         const isFirst = !_firstStored; _firstStored = true;
-        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null };
+        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null, category: shape.category || null };
         placedCells.push({ gr, gc });
       }
 
