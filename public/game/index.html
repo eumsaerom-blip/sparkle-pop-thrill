@@ -979,6 +979,17 @@ body.redzone-shake { animation: screenShake .25s linear infinite; }
 @keyframes rerollFlash { 0%{filter:brightness(1.6) hue-rotate(0)} 100%{filter:none} }
 .belt-box.reroll-flash { animation: rerollFlash .4s ease-out; }
 
+/* STEP 7: 세트 보너스 황금 셀 */
+@keyframes goldPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(240,192,64,.0), inset 0 0 6px rgba(240,192,64,.3); }
+  50%     { box-shadow: 0 0 14px 2px rgba(240,192,64,.55), inset 0 0 10px rgba(240,192,64,.55); }
+}
+.cell.set-gold {
+  background: #FFF3B0 !important;
+  border-color: #F0C040 !important;
+  animation: goldPulse 1.4s ease-in-out infinite;
+}
+
 
 
 /* ===================================================
@@ -1167,23 +1178,23 @@ const CONFIG = {
 /* ===  도형 정의  === */
 const SHAPES = {
   easy: [
-    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2, rarity:'common' },
-    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3, rarity:'common' },
-    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3, rarity:'common' },
+    { key:'dot',  cells:[[1]],              label:'립스틱',       emoji:'💄', pts: 2, rarity:'common', size:1, category:'beauty' },
+    { key:'h2',   cells:[[1,1]],            label:'아이팔레트',   emoji:'🎨', pts: 3, rarity:'common', size:2, category:'beauty' },
+    { key:'v2',   cells:[[1],[1]],          label:'세럼 앰플',    emoji:'💧', pts: 3, rarity:'common', size:2, category:'beauty' },
   ],
   medium: [
-    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5, rarity:'common' },
-    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5, rarity:'common' },
-    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7, rarity:'rare' },
-    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6, rarity:'common' },
-    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6, rarity:'rare' },
+    { key:'h3',   cells:[[1,1,1]],          label:'마스카라 세트', emoji:'👁️', pts: 5, rarity:'common', size:3, category:'beauty' },
+    { key:'v3',   cells:[[1],[1],[1]],      label:'아로마 캔들',  emoji:'🕯️', pts: 5, rarity:'common', size:3, category:'home' },
+    { key:'sq',   cells:[[1,1],[1,1]],      label:'영양크림',     emoji:'🫙',  pts: 7, rarity:'rare',   size:4, category:'beauty' },
+    { key:'l2',   cells:[[1,0],[1,1]],      label:'향수 디퓨저',  emoji:'🧴', pts: 6, rarity:'common', size:3, category:'home' },
+    { key:'r2',   cells:[[0,1],[1,1]],      label:'주얼리 트레이',emoji:'💍', pts: 6, rarity:'rare',   size:3, category:'home' },
   ],
   hard: [
-    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10, rarity:'rare' },
-    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10, rarity:'epic' },
-    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11, rarity:'epic' },
-    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12, rarity:'legendary' },
-    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12, rarity:'epic' },
+    { key:'L',    cells:[[1,0],[1,0],[1,1]],     label:'드라이기',     emoji:'💇‍♀️', pts:10, rarity:'rare',      size:4, category:'home' },
+    { key:'J',    cells:[[0,1],[0,1],[1,1]],     label:'스탠드 미러',  emoji:'🪞',   pts:10, rarity:'epic',      size:4, category:'home' },
+    { key:'T',    cells:[[1,1,1],[0,1,0]],       label:'미니 소파',    emoji:'🛋️',  pts:11, rarity:'epic',      size:4, category:'home' },
+    { key:'S',    cells:[[0,1,1],[1,1,0]],       label:'식물 화분',    emoji:'🪴',   pts:12, rarity:'legendary', size:4, category:'nature' },
+    { key:'Z',    cells:[[1,1,0],[0,1,1]],       label:'액자 세트',    emoji:'🖼️',  pts:12, rarity:'epic',      size:4, category:'home' },
   ],
 };
 
@@ -1264,6 +1275,13 @@ function makeState() {
     // 소모성 아이템
     items:         { pause: 1, reroll: 1, bomb: 1 },
     totalUnboxed:  0,
+
+    // 세트 보너스 (STEP 7)
+    categoryCount:    { food:0, toy:0, beauty:0, nature:0, home:0 },
+    setBonusActive:   false,
+    setBonusCategory: null,
+    setBonusEndTs:    0,
+    setBonusTimer:    null,
   };
 }
 
@@ -1324,6 +1342,9 @@ function renderGrid() {
       const cell = S.grid[r][c];
       if (cell) {
         applyFilledStyle(el, cell.color, { gold: cell.gold, emoji: cell.emoji });
+        if (S.setBonusActive && cell.category === S.setBonusCategory) {
+          el.classList.add('set-gold');
+        }
       }
 
       el.addEventListener('mouseenter', () => onHover(r, c));
@@ -1488,7 +1509,7 @@ function onCellClick(r, c) {
       if (shape.cells[dr][dc]) {
         const gr = r + dr, gc = c + dc;
         const isFirst = !_firstStored; _firstStored = true;
-        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null };
+        S.grid[gr][gc] = { color, gold: !!gold, emoji: isFirst ? shape.emoji : null, category: shape.category || null };
         placedCells.push({ gr, gc });
       }
 
@@ -1498,6 +1519,10 @@ function onCellClick(r, c) {
   let pts = shape.pts * cellCount * CONFIG.PTS_PER_CELL;
   if (gold) pts *= CONFIG.GOLD_MULTIPLIER;
   if (S.fever) pts *= 3;
+  // STEP 7: 세트 보너스 활성 + 카테고리 일치 시 점수 2배
+  if (S.setBonusActive && shape.category && S.setBonusCategory === shape.category) {
+    pts *= 2;
+  }
 
   // rare 이상 획득 카운트
   if (rarity && rarity !== 'common') S.rareCount++;
@@ -1538,6 +1563,22 @@ function onCellClick(r, c) {
 
   S.currentItem = null;
   renderItemPreview();
+
+  // STEP 7: 세트 카운트 증가 → 3 이상이면 보너스
+  if (shape.category && S.categoryCount[shape.category] != null) {
+    S.categoryCount[shape.category]++;
+    if (S.categoryCount[shape.category] >= 3 &&
+        (!S.setBonusActive || S.setBonusCategory !== shape.category)) {
+      setBonus(shape.category);
+    }
+  }
+  // 보너스 활성 + 카테고리 일치 셀에 gold 클래스
+  if (S.setBonusActive && shape.category === S.setBonusCategory) {
+    placedCells.forEach(({ gr, gc }) => {
+      const el = getCell(gr, gc);
+      if (el) el.classList.add('set-gold');
+    });
+  }
 
   // ── check line clears (brief delay for snap anim) ──
   setTimeout(checkLineClear, 120);
@@ -1598,6 +1639,22 @@ function pickShape() {
   let pool = [...SHAPES.easy];
   if (S.timeElapsed >= CONFIG.MEDIUM_AT) pool = pool.concat(SHAPES.medium);
   if (S.timeElapsed >= CONFIG.HARD_AT)   pool = pool.concat(SHAPES.hard);
+
+  // STEP 6: 빈 칸이 정확히 1칸이면 1x1 아이템 가중치 3배
+  let emptyCells = 0;
+  if (S.grid && S.grid.length) {
+    for (let r = 0; r < S.gridRows; r++)
+      for (let c = 0; c < S.gridCols; c++)
+        if (S.grid[r][c] === null) emptyCells++;
+  }
+  if (emptyCells === 1) {
+    const weighted = [];
+    pool.forEach(s => {
+      const w = (s.size === 1) ? 3 : 1;
+      for (let i = 0; i < w; i++) weighted.push(s);
+    });
+    pool = weighted;
+  }
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -2093,6 +2150,40 @@ function updateSaleBubble() {
 /* ===================================================
    🎒  소모성 아이템 (정지 / 리롤 / 폭파)
    =================================================== */
+/* ===================================================
+   ✨ 세트 보너스 (STEP 7)
+   =================================================== */
+const CATEGORY_LABELS = {
+  food: '푸드', toy: '토이', beauty: '뷰티', nature: '네이처', home: '홈',
+};
+function setBonus(category) {
+  S.setBonusActive   = true;
+  S.setBonusCategory = category;
+  S.setBonusEndTs    = performance.now() + 30000;
+
+  showToast(`✨ ${CATEGORY_LABELS[category] || category} 세트 완성! 30초간 점수 2배`, 'good');
+
+  // 기존 같은 카테고리 셀에 set-gold 클래스 부여
+  for (let r = 0; r < S.gridRows; r++) {
+    for (let c = 0; c < S.gridCols; c++) {
+      const cell = S.grid[r] && S.grid[r][c];
+      if (cell && cell.category === category) {
+        const el = getCell(r, c);
+        if (el) el.classList.add('set-gold');
+      }
+    }
+  }
+
+  if (S.setBonusTimer) clearTimeout(S.setBonusTimer);
+  S.setBonusTimer = setTimeout(() => endSetBonus(), 30000);
+}
+function endSetBonus() {
+  S.setBonusActive   = false;
+  S.setBonusCategory = null;
+  if (S.setBonusTimer) { clearTimeout(S.setBonusTimer); S.setBonusTimer = null; }
+  document.querySelectorAll('.cell.set-gold').forEach(el => el.classList.remove('set-gold'));
+}
+
 function updateItemButtons() {
   const map = { pause: 'btn-pause', reroll: 'btn-reroll', bomb: 'btn-bomb' };
   Object.keys(map).forEach(k => {
@@ -2281,6 +2372,9 @@ function restartGame() {
   const fbw = document.getElementById('fever-bar-wrap');
   if (fbw) fbw.style.display = 'none';
   document.querySelectorAll('.fever-banner').forEach(b => b.remove());
+  // 세트 보너스 초기화
+  if (S && S.setBonusTimer) { clearTimeout(S.setBonusTimer); S.setBonusTimer = null; }
+  document.querySelectorAll('.cell.set-gold').forEach(el => el.classList.remove('set-gold'));
   S = makeState();
   initGrid();
   renderGrid();
