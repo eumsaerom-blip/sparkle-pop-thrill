@@ -1655,6 +1655,7 @@ function openBox(id) {
   }
 
   const box = S.boxes.splice(idx, 1)[0];
+  S.totalUnboxed++;
 
   // ── unboxing animation: lid pops open + item shoots up ──
   box.el.classList.add('unboxing');
