@@ -2127,6 +2127,7 @@ function restartGame() {
   updateTimer();
   updateOverflowBadge();
   recalcPressure();
+  updateItemButtons();
   document.getElementById('overflow-badge').textContent = '누락 0개';
   document.getElementById('overflow-badge').className   = 'overflow-badge';
 
