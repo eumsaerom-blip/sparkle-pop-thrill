@@ -976,6 +976,9 @@ body.redzone-shake { animation: screenShake .25s linear infinite; }
 .share-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255,107,107,.5); }
 .share-btn:active { transform: translateY(0); }
 
+@keyframes rerollFlash { 0%{filter:brightness(1.6) hue-rotate(0)} 100%{filter:none} }
+.belt-box.reroll-flash { animation: rerollFlash .4s ease-out; }
+
 
 
 /* ===================================================
