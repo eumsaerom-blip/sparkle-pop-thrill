@@ -1550,6 +1550,22 @@ function onCellClick(r, c) {
   S.currentItem = null;
   renderItemPreview();
 
+  // STEP 7: 세트 카운트 증가 → 3 이상이면 보너스
+  if (shape.category && S.categoryCount[shape.category] != null) {
+    S.categoryCount[shape.category]++;
+    if (S.categoryCount[shape.category] >= 3 &&
+        (!S.setBonusActive || S.setBonusCategory !== shape.category)) {
+      setBonus(shape.category);
+    }
+  }
+  // 보너스 활성 + 카테고리 일치 셀에 gold 클래스
+  if (S.setBonusActive && shape.category === S.setBonusCategory) {
+    placedCells.forEach(({ gr, gc }) => {
+      const el = getCell(gr, gc);
+      if (el) el.classList.add('set-gold');
+    });
+  }
+
   // ── check line clears (brief delay for snap anim) ──
   setTimeout(checkLineClear, 120);
 
