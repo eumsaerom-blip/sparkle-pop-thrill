@@ -1264,6 +1264,13 @@ function makeState() {
     // 소모성 아이템
     items:         { pause: 1, reroll: 1, bomb: 1 },
     totalUnboxed:  0,
+
+    // 세트 보너스 (STEP 7)
+    categoryCount:    { food:0, toy:0, beauty:0, nature:0, home:0 },
+    setBonusActive:   false,
+    setBonusCategory: null,
+    setBonusEndTs:    0,
+    setBonusTimer:    null,
   };
 }
 
